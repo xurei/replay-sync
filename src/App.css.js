@@ -71,6 +71,13 @@ const style = `
     font-family: 'Montserrat', sans-serif;
   }
   
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+  
   :root {
     color-scheme: dark;
     scrollbar-color: rgba(249,249,250,.4) rgba(20,20,25,.3);
@@ -130,6 +137,18 @@ const style = `
   
   .clickable {
     cursor: pointer;
+  }
+
+  input[type="text"] {
+    margin: 0 auto;
+    margin-top: 6px;
+    padding: 8px;
+    width: 300px;
+    border: solid 2px #666;
+    border-radius: 5px;
+    font-size: 1.1em;
+    background: #444;
+    color: #fff;
   }
 `;
 
