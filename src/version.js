@@ -1,6 +1,8 @@
 import localStorage from 'store/dist/store.legacy';
 
-const version = require('../package.json').version;
+import _package from '../package.json';
+const version = _package.version;
+_package = null; //Free useless memory as we only need the version field
 let lastVersionVisited = localStorage.get('lastVersionVisited');
 
 function hasNewVersion() {

@@ -1,4 +1,4 @@
-import './App.css';
+import './App.css.js';
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import { FlexLayout, FlexChild } from 'xureact/lib/module/components/layout/flex-layout';

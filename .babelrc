@@ -1,0 +1,39 @@
+{
+    "presets": [
+        ["@babel/preset-env", {
+            "modules": false,
+            "corejs": 3,
+            "useBuiltIns": "usage",
+            "targets": {
+                "chrome": "40",
+                "firefox": "40",
+                "ie": "10",
+                "edge": "12"
+            }
+        }],
+        "@babel/preset-react"
+    ],
+    "plugins": [
+        ["inline-json-import", {}],
+        [
+            "babel-plugin-inline-import",
+            {
+                "extensions": ["md"]
+            }
+        ],
+        "@babel/plugin-syntax-jsx",
+        ["@babel/plugin-transform-runtime", {
+            "corejs": 3,
+            "proposals": true
+        }],
+        "@babel/plugin-syntax-dynamic-import",
+        ["@babel/plugin-proposal-decorators", {
+            "legacy": true
+        }],
+        "@babel/plugin-proposal-class-properties",
+        ["babel-plugin-styled-components", {
+            "ssr": false,
+            "minify": true
+        }]
+    ]
+}

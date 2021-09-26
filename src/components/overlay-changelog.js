@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
 
 import { OverlayWrapper } from './overlay-wrapper';
-import { changelog } from '../changelog';
+import changelog from '../CHANGELOG.md';
 import ReactMarkdown from 'react-markdown';
 import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
 
@@ -19,15 +19,13 @@ class OverlayChangelog extends React.Component {
   
   componentDidMount() {
     this._ismounted = true;
-    changelog.then(changelogContent => {
-      if (this._ismounted) {
-        this.setState(state => ({
-          ...state,
-          loading: false,
-          changelog: changelogContent,
-        }));
-      }
-    });
+    if (this._ismounted) {
+      this.setState(state => ({
+        ...state,
+        loading: false,
+        changelog: changelog,
+      }));
+    }
   }
   
   componentWillUnmount() {
