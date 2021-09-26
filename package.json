@@ -11,8 +11,7 @@
   "scripts": {
     "watch": "BABEL_ENV=module node_modules/.bin/babel src --watch -d lib/module",
     "build": "rimraf lib/* && npm run build:module",
-    "build:module": "BABEL_ENV=module node_modules/.bin/babel src -d lib/module",
-    "postinstall": "npm install && npm run build && rm -rf node_modules"
+    "build:module": "BABEL_ENV=module node_modules/.bin/babel src -d lib/module"
   },
   "dependencies": {
     "date-fns": "^2.21.2",
