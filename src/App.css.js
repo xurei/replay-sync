@@ -76,9 +76,6 @@ const style = `
     scrollbar-color: rgba(249,249,250,.4) rgba(20,20,25,.3);
   }
   
-  .App {
-  }
-  
   * {
     box-sizing: border-box;
   }
