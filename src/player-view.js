@@ -17,7 +17,7 @@ import { OverlayDonate } from './components/overlay-donate';
 import { formatDateTimeSeconds, formatFullTime, getDayOfYear } from './date-util';
 import { hasNewVersion, setLastVersionVisited } from './version';
 
-require('./App.css.js'); // Force using require to make sure it's imported
+import { style } from './App.css.js';
 
 let metaByStreamer = null;
 
@@ -220,6 +220,7 @@ class PlayerView extends React.Component {
     
     return (
       <div className={props.className}>
+        <style>{style}</style>
         <div style={{ height: '100vh', width: '100vw'}}>
           {state.thanksShown && (
             <OverlayThanks onClose={() => this.setState(state => ({...state, thanksShown: false}))}/>

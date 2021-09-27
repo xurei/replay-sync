@@ -1,5 +1,3 @@
-import injectCss from 'xureact/lib/module/util/inject-css';
-
 //language=CSS
 const style = `
   /* latin-ext */
@@ -152,4 +150,4 @@ const style = `
   }
 `;
 
-injectCss('App', style);
+export { style }
