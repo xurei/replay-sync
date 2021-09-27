@@ -43,7 +43,7 @@ class OverlayChangelog extends React.Component {
         <div className={props.className}>
           <FlexLayout direction="column" className="fullh">
             <FlexChild>
-              <h1 style={{marginBottom: 0}}><img src={props.config.logo.size192} alt="RPZ Synchro" width={192} height={192}/></h1>
+              <h1 style={{marginBottom: 0}}><img src={props.config.logo.size192} alt={props.config.appName} width={192} height={192}/></h1>
               <h2 style={{marginTop: 0}}>
                 Par <a href="https://twitch.tv/xurei" target="_blank" rel="noreferrer">xurei</a>
                 {' '}

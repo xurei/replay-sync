@@ -20,7 +20,7 @@ class OverlayDonate extends React.Component {
         <div className={props.className}>
           <FlexLayout direction="column" className="fullh">
             <FlexChild>
-              <h1 style={{marginBottom: 0}}><img src={props.config.logo.size192} alt="RPZ Synchro" width={96} height={96}/></h1>
+              <h1 style={{marginBottom: 0}}><img src={props.config.logo.size192} alt={props.config.appName} width={96} height={96}/></h1>
               <div style={{paddingBottom: 10}}>
                 <h2 style={{marginBottom: 0}}>Vous aimez notre travail ?</h2>
                 Vous pouvez faire une donation ici : <br/>

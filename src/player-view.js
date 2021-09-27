@@ -270,7 +270,7 @@ class PlayerView extends React.Component {
               <FlexLayout direction="row">
                 <FlexChild grow={0} width={200}>
                   <div style={{paddingLeft: 5, paddingTop: 3}}>
-                    <img src={props.config.logo.size64} alt="RPZ Synchro" width={32} height={32}/>
+                    <img src={props.config.logo.size64} alt={props.config.appName} width={32} height={32}/>
                   </div>
                 </FlexChild>
                 <FlexChild grow={1} width={1}>
