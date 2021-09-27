@@ -27,7 +27,7 @@ class OverlayDonate extends React.Component {
                 <br/>
                 <div className="d-inline-block" style={{width: '20%'}}>
                   <a href="https://fr.tipeee.com/xureilab" target="_blank" rel="noreferrer">
-                    <IconTipeee color="#47AF2E" size={80}/>
+                    <IconTipeee color={props.config.colorPalette.common.primary} size={80}/>
                     <br/>
                     <br/>
                     Tipeee
@@ -35,7 +35,7 @@ class OverlayDonate extends React.Component {
                 </div>
                 <div className="d-inline-block" style={{width: '30%'}}>
                   <a href="https://github.com/sponsors/xurei?frequency=one-time" target="_blank" rel="noreferrer">
-                    <IconGithub color="#47AF2E" size={60}/>
+                    <IconGithub color={props.config.colorPalette.common.primary} size={60}/>
                     <br/>
                     Github Sponsors
                   </a>

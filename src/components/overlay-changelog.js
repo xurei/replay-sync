@@ -6,6 +6,9 @@ import { OverlayWrapper } from './overlay-wrapper';
 import changelog from '../CHANGELOG.md';
 import ReactMarkdown from 'react-markdown';
 import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
+import { IconDiscord } from './icon-discord';
+import { IconTwitter } from './icon-twitter';
+import { IconTwitch } from './icon-twitch';
 
 class OverlayChangelog extends React.Component {
   static propTypes = {
@@ -47,11 +50,17 @@ class OverlayChangelog extends React.Component {
                 et <a href="https://twitter.com/diffty" target="_blank" rel="noreferrer">DiFFtY</a>
               </h2>
               <div>
-                <a href="https://discord.gg/hFwbdh5TeX" target="_blank" rel="noreferrer"><img src="/icon-discord.svg" alt="Discord"/></a>
+                <a href="https://discord.gg/hFwbdh5TeX" target="_blank" rel="noreferrer">
+                  <IconDiscord size={24} color={props.config.colorPalette.common.primary}/>
+                </a>
                 <span className="d-inline-block" style={{width: 15}}/>
-                <a href="https://www.twitter.com/xurei" target="_blank" rel="noreferrer"><img src="/icon-twitter.svg" alt="Twitter"/></a>
+                <a href="https://www.twitter.com/xurei" target="_blank" rel="noreferrer">
+                  <IconTwitter size={24} color={props.config.colorPalette.common.primary}/>
+                </a>
                 <span className="d-inline-block" style={{width: 15}}/>
-                <a href="https://www.twitch.tv/xurei" target="_blank" rel="noreferrer"><img src="/icon-twitch.svg" alt="Twitch"/></a>
+                <a href="https://www.twitch.tv/xurei" target="_blank" rel="noreferrer">
+                  <IconTwitch size={24} color={props.config.colorPalette.common.primary}/>
+                </a>
               </div>
               <br/>
             </FlexChild>
