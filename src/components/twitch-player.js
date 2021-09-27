@@ -4,9 +4,6 @@ import deepEqual from 'deep-eql'; //eslint-disable-line no-unused-vars
 import { tsToVodTime } from '../time-util.js';
 require('../vendor/twitch_embed_v1');
 
-console.log(global.Twitch);
-console.log(global.Twitch);
-
 class TwitchPlayer extends React.Component {
   static propTypes = {
     video_id: PropTypes.string.isRequired,

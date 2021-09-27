@@ -1,4 +1,3 @@
-import './App.css.js';
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import { FlexLayout, FlexChild } from 'xureact/lib/module/components/layout/flex-layout';
@@ -17,6 +16,8 @@ import { IconGift } from './components/icon-gift';
 import { OverlayDonate } from './components/overlay-donate';
 import { formatDateTimeSeconds, formatFullTime, getDayOfYear } from './date-util';
 import { hasNewVersion, setLastVersionVisited } from './version';
+
+require('./App.css.js'); // Force using require to make sure it's imported
 
 let metaByStreamer = null;
 
