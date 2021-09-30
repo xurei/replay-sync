@@ -61,7 +61,7 @@ OverlayShare = Styled(OverlayShare)`
   text-align: center;
   padding: 20px 20px;
   
-  input {
+  input[type="text"] {
     width: 100%;
     text-align: center;
   }
