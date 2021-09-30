@@ -204,9 +204,13 @@ class MultiTimelines extends React.Component {
     const props = this.props;
     const daysContents = [];
     let i = 1;
+    
+    const nbDays = (props.config.endTimestamp - props.config.startTimestamp) / (1000*3600*24);
+    const dayLabel = nbDays < 30 ? 'Jour ' : 'J' ;
+    
     for (let time=props.config.startTimestamp; time <= props.config.endTimestamp; time += 1000*3600*24) {
       daysContents.push(<div className="multitimeline__day-block text-center">
-        Jour {i}
+        {dayLabel}{i}
       </div>);
       i++;
     }
