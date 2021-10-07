@@ -14,6 +14,7 @@ let metaByVid = null;
 
 class MultiPlayers extends React.Component {
   static propTypes = {
+    config: PropTypes.object.isRequired,
     metaByVid: PropTypes.object.isRequired,
     onTimeUpdate: PropTypes.func.isRequired,
     onRemovePlayer: PropTypes.func.isRequired,
@@ -340,8 +341,21 @@ MultiPlayers = Styled(MultiPlayers)`
     }
     
     > div {
-      background: radial-gradient(#162613, black);
-        //linear-gradient(to top left, #1C3216, black);
+      ${props => {
+        if (props.config.offlineBackground) {
+          //language=SCSS
+          return `
+            background-image: url(${props.config.offlineBackground});
+            background-size: cover;
+            background-position: 80% 45%;
+            text-shadow: 0 0 8px black;
+          `;
+        }
+        else {
+          //language=SCSS
+          return `background: radial-gradient(#162613, black)`;
+        }
+      }}
     }
   }
   

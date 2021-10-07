@@ -37,6 +37,9 @@ function findMatchingVOD(streamerName, global_time) {
 }
 function findNextVOD(streamerName, global_time) {
   const meta = Object.values(metaByStreamer[streamerName]);
+  meta.sort((a,b) => {
+    return a.createdTs - b.createdTs;
+  });
   for (const vod of meta) {
     const createdTs = vod.createdTs;
     if (createdTs > global_time) {
@@ -305,6 +308,7 @@ class PlayerView extends React.Component {
                 <FlexChild grow={1} width={1}>
                   <div className="fullh">
                     <MultiPlayers
+                      config={props.config}
                       metaByVid={props.metaByVid}
                       ref={this.multiplayersRef}
                       global_time={this.state.global_time}
