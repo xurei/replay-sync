@@ -294,16 +294,6 @@ MultiPlayers = Styled(MultiPlayers)`
     }
   }
   
-  .multiplayers__player-muted {
-    //border-color: transparent;
-    
-  }
-  
-  .multiplayers__player-offline {
-    background: red;
-    text-shadow: 0 0 2px red;
-  }
-  
   .multiplayers__volume-on {
     position: absolute;
     bottom: 10px;
