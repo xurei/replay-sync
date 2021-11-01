@@ -164,7 +164,7 @@ class MultiPlayers extends React.Component {
               const videoMeta = metaByVid[streamer.next_video_id];
               const nextVodTime = !videoMeta ? 0 : -Math.floor(props.global_time - videoMeta.createdTs);
               return (
-                <div key={index} className="multiplayers__player multiplayers__player-muted">
+                <div key={index} className="multiplayers__player multiplayers__player-muted multiplayers__player-offline">
                   {this.renderPlayerOverlayControls(streamer, index)}
                   <VCenter>
                     <div className="text-center">
@@ -299,6 +299,11 @@ MultiPlayers = Styled(MultiPlayers)`
     
   }
   
+  .multiplayers__player-offline {
+    background: red;
+    text-shadow: 0 0 2px red;
+  }
+  
   .multiplayers__volume-on {
     position: absolute;
     bottom: 10px;
@@ -348,7 +353,9 @@ MultiPlayers = Styled(MultiPlayers)`
             background-image: url(${props.config.offlineBackground});
             background-size: cover;
             background-position: 80% 45%;
-            text-shadow: 0 0 8px black;
+            text-shadow:
+              0 0 5px #000,
+              -1px 0 1px ${props.config.colorPalette.common.primary};
           `;
         }
         else {

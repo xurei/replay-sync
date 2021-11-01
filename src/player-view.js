@@ -295,9 +295,9 @@ class PlayerView extends React.Component {
                       <button onClick={this.handleDonateClick} style={{fontSize: 16, lineHeight: '22px', paddingTop: 7}}>
                         <IconDonate size={16} color="#fff"/>
                       </button>
-                      <button onClick={this.handleThanksClick} style={{fontSize: 20}}>
-                        ♥
-                      </button>
+                      {/*<button onClick={this.handleThanksClick} style={{fontSize: 20}}>*/}
+                      {/*  ♥*/}
+                      {/*</button>*/}
                     </div>
                   )}
                 </FlexChild>
