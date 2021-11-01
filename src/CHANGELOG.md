@@ -1,3 +1,7 @@
+## Version 0.3.4 - Bugfixes de la timeline
+- **Des jours et des jours** Les blocs de jours s'affichent correctement.
+- **Et à la fin c'est quelle heure ?** L'heure affichée à la sélection est affichée sur la droite.
+ 
 ## Version 0.3.3 - Bugfixes et interface améliorée
 - **Youtube, fais ce qu'on te dis !** En cas de vidéo qui démarre en leader, l'app s'assure de bien démarrer au début et pas de partir à la position mémorisée.
 - **Du détail SVP** Affiche le timecode au survol de la timeline

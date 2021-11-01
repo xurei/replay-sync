@@ -193,8 +193,7 @@ class MultiTimelines extends React.Component {
         <div className="multitimeline__time-bar select" style={{
           left: `${(selectTime-props.config.startTimestamp)*100 / this.totalLength}%`,
         }}>
-          <div className="select-timecode">{formatFullTime(selectTime)}</div>
-          
+          <div className={`select-timecode ${state.cursorPosition > 0.9 ? 'select-timecode__right' : 'select-timecode__left'}`}>{formatFullTime(selectTime)}</div>
         </div>
       );
     }
@@ -468,11 +467,16 @@ MultiTimelines = Styled(MultiTimelines)`
           position: absolute;
           background: #B0B051;
           top: -9px;
-          left: 0;
           transform: translate(0, -50%);
           color: #111;
           font-size: 0.8em;
           padding: 2px;
+        }
+        .select-timecode__left {
+          left: 0;
+        }
+        .select-timecode__right {
+          right: 0;
         }
       }
     }

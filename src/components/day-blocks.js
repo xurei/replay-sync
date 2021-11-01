@@ -1,6 +1,8 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
+import { addDays } from 'date-fns/esm';
+import { atMidnigth } from '../date-util';
 
 class DayBlocks extends React.Component {
   static propTypes = {
@@ -9,36 +11,36 @@ class DayBlocks extends React.Component {
     height: PropTypes.number,
   };
   
-  midnights = [];
-  
-  constructor(props) {
-    super(props);
-    for (let time = props.config.startTimestamp; time <= props.config.endTimestamp; time += 1000*3600*24) {
-      this.midnights.push(time);
-    }
-    console.log(this.midnights);
-  }
-  
   render() {
     const props = this.props;
     const contents = props.contents || [];
     const startTimestamp = props.config.startTimestamp;
     const endTimestamp = props.config.endTimestamp;
     const totalLength = endTimestamp - startTimestamp;
+    
+    const elements = [];
+    let curTimestamp = startTimestamp;
+    let index = 0;
+    while (curTimestamp < endTimestamp) {
+      const nextTimestamp = atMidnigth(addDays(new Date(curTimestamp), 1)).getTime();
+      const content = contents[index] || null;
+      const dayLength = nextTimestamp - curTimestamp;
+      elements.push(
+        <div key={curTimestamp} className="day-blocks__day-block" style={{
+          left: `${(curTimestamp-startTimestamp)*100 / totalLength}%`,
+          width: `${100*dayLength/totalLength}%`,
+          height: props.height || 18,
+        }}>
+          {content}
+        </div>
+      );
+      curTimestamp = nextTimestamp;
+      ++index;
+    }
+    
     return (
       <div className={props.className}>
-        {this.midnights.map((midnight, index) => {
-          const content = contents[index] || null;
-          return (
-            <div key={midnight} className="day-blocks__day-block" style={{
-              left: `${(midnight-startTimestamp)*100 / totalLength}%`,
-              width: `${100/this.midnights.length}%`,
-              height: props.height || 18,
-            }}>
-              {content}
-            </div>
-          );
-        })}
+        {elements}
       </div>
     );
   }
