@@ -299,6 +299,7 @@ MultiPlayers = Styled(MultiPlayers)`
     bottom: 10px;
     left: 15px;
     opacity: 0.68;
+    pointer-events: none;
   }
 
   .multiplayers__player-overlay-globaltime {
