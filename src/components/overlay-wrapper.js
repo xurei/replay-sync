@@ -63,11 +63,12 @@ OverlayWrapper = Styled(OverlayWrapper)`
     top: 10px;
     width: 30px;
     height: 30px;
-    line-height: 28px;
+    line-height: 24px;
     font-size: 30px;
     text-align: center;
     color: #bbb;
     z-index: 100;
+    border-radius: 100px;
     
     &:hover {
       color: #fff;
@@ -82,6 +83,7 @@ OverlayWrapper = Styled(OverlayWrapper)`
     max-width: 1024px;
     width: 80%;
     box-shadow: 0 0 10px rgba(0,0,0, 0.5);
+    border-radius: 16px;
   }
 
   .overlay__content-scroll {
@@ -90,6 +92,7 @@ OverlayWrapper = Styled(OverlayWrapper)`
     height: 100%;
     overflow-y: auto;
     background: #111;
+    border-radius: 16px 16px 14px 14px;
   }
 }
 `;

@@ -264,36 +264,25 @@ class PlayerView extends React.Component {
             <OverlayShare link={state.shareLink} onClose={() => this.setState(state => ({...state, shareShown: false}))}/>
           )}
           <FlexLayout direction="column">
-            {/*<FlexChild height={1} grow={1}>*/}
-            {/*  <div className="fullh scroll-y">*/}
-            {/*    <pre>{JSON.stringify(state, null, '  ')}</pre>*/}
-            {/*  </div>*/}
-            {/*</FlexChild>*/}
-            <FlexChild height={40} grow={0}>
+            <FlexChild height={1} grow={3}>
               <FlexLayout direction="row">
-                <FlexChild grow={0} width={200}>
-                  <div style={{paddingLeft: 5, paddingTop: 3}}>
+                <FlexChild width={48} grow={0}>
+                  <div className="player-view__logo-wrapper">
                     <img src={props.config.logo.size64} alt={props.config.appName} width={32} height={32}/>
                   </div>
-                </FlexChild>
-                <FlexChild grow={1} width={1}>
-                  <div className="text-center">
-                    <div className="player-view__global-time">
-                      {formatDateTimeSeconds(state.global_time)}
-                    </div>
-                  </div>
-                </FlexChild>
-                <FlexChild grow={0} width={200}>
                   {!this.anyOverlayShown && (
                     <div className="player-view__controls__buttons">
                       <button onClick={this.handleShareClick} style={{fontSize: 16, lineHeight: '20px', paddingTop: 7}}>
-                        <IconShare size={14} color="#fff"/>
+                        <IconShare size={20} color="inherit"/>
+                        <div className="player-view__controls__button-text">Lien de partage</div>
                       </button>
                       <button className={`${hasNewVersion() ? 'new-version' : ''}`} onClick={this.handleChangelogClick} style={{fontSize: 16, lineHeight: '20px', paddingTop: 7}}>
-                        <IconGift className="gift" size={14} color="#fff"/>
+                        <IconGift className="gift" size={20} color="inherit"/>
+                        <div className="player-view__controls__button-text">Notes de version</div>
                       </button>
                       <button onClick={this.handleDonateClick} style={{fontSize: 16, lineHeight: '22px', paddingTop: 7}}>
-                        <IconDonate size={16} color="#fff"/>
+                        <IconDonate size={22} color="inherit"/>
+                        <div className="player-view__controls__button-text">Soutenir le projet</div>
                       </button>
                       {/*<button onClick={this.handleThanksClick} style={{fontSize: 20}}>*/}
                       {/*  ♥*/}
@@ -301,10 +290,6 @@ class PlayerView extends React.Component {
                     </div>
                   )}
                 </FlexChild>
-              </FlexLayout>
-            </FlexChild>
-            <FlexChild height={1} grow={3}>
-              <FlexLayout direction="row">
                 <FlexChild grow={1} width={1}>
                   <div className="fullh">
                     <MultiPlayers
@@ -325,7 +310,12 @@ class PlayerView extends React.Component {
                 </FlexChild>
               </FlexLayout>
             </FlexChild>
-            <FlexChild grow={0}>
+            <FlexChild grow={0} height={30}>
+              <div className="text-center">
+                <div className="player-view__global-time">
+                  {formatDateTimeSeconds(state.global_time)}
+                </div>
+              </div>
             </FlexChild>
             <FlexChild grow={0}>
               <div className="player-view__controls">
@@ -451,16 +441,20 @@ PlayerView = Styled(PlayerView)`
     padding-left: 10px;
   }
   
+  .player-view__logo-wrapper {
+    text-align: center;
+    padding-top: 5px;
+  }
+  
   .player-view__controls__buttons {
-    padding: 3px 4px 0 0;
+    padding: 15px 0 0 0;
     text-align: right;
     background: #0E0E10;
     position: relative;
-    float: right;
-    width: 200px;
     button {
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
+      margin: 0 auto;
       line-height: 10px;
       text-align: center;
       padding-left: 0;
@@ -468,23 +462,64 @@ PlayerView = Styled(PlayerView)`
       vertical-align: top;
       border-radius: 0;
       position: relative;
-
-      &:first-child {
-        border-radius: 3px 0 0 3px;
-      }
-      &:last-child {
-        border-radius: 0 3px 3px 0;
-      }
-      &:not(:last-child):not(:hover):after {
-        content: "";
+      display: block;
+      background: none;
+      border: none;
+      
+      .player-view__controls__button-text {
+        display: none;
         position: absolute;
-        display: block;
-        top: 0;
-        right: 0;
-        width: 1px;
-        height: 100%;
-        background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 33%, rgba(0,0,0,0.1) 66%, rgba(0,0,0,0) 100%);
+        background: #0E0E10;
+        color: #ccc;
+        border: solid 1px ${props => props.config.colorPalette.button.background};
+        border-radius: 3px;
+        padding: 3px 8px;
+        z-index: 10;
+        white-space: nowrap;
+        top: 3px;
+        left: 40px;
+        opacity: 0.9;
+        &:before {
+          content : "";
+          width: 1px;
+          height: 1px;
+          position: absolute;
+          top: 8px;
+          left: -12px;
+          border: solid 5px transparent;
+          border-right-color: ${props => props.config.colorPalette.button.background};
+        }
       }
+      
+      fill: #bbb;
+      &:hover {
+        fill: ${props => props.config.colorPalette.button.background};
+        border: none;
+      
+        &:before {
+          content: "";
+        }
+        .player-view__controls__button-text {
+          display: block;
+        }
+      }
+
+      //&:first-child {
+      //  border-radius: 3px 0 0 3px;
+      //}
+      //&:last-child {
+      //  border-radius: 0 3px 3px 0;
+      //}
+      //&:not(:last-child):not(:hover):after {
+      //  content: "";
+      //  position: absolute;
+      //  display: block;
+      //  top: 0;
+      //  right: 0;
+      //  width: 1px;
+      //  height: 100%;
+      //  background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0.1) 33%, rgba(0,0,0,0.1) 66%, rgba(0,0,0,0) 100%);
+      //}
     }
   }
   

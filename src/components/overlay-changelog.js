@@ -98,6 +98,10 @@ OverlayChangelog = Styled(OverlayChangelog)`
     }
   }
   
+  strong {
+    color: ${props => props.config.colorPalette.common.primary};
+  }
+  
   .overlay-changelog__changelog-content {
     position: relative;
     overflow-y: scroll;

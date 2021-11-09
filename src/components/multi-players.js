@@ -315,7 +315,7 @@ MultiPlayers = Styled(MultiPlayers)`
     right: 0;
     z-index: 50;
     padding: 3px 5px;
-    background: #313335;
+    //background: #313335;
     text-align: right;
     visibility: hidden;
   }
@@ -335,25 +335,26 @@ MultiPlayers = Styled(MultiPlayers)`
     &.grid5, &.grid6, &.grid7, &.grid8, &.grid9  {
       grid-template-columns: 1fr 1fr 1fr;
     }
+  }
+  
+  .multiplayers__player-offline {
+    text-shadow: 0 0 5px #000, -1px 0 1px ${props => props.config.colorPalette.common.primary};
+    background: ${props => props.config.offlineBackgroundColor || 'none'};
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
     
-    > div {
-      ${props => {
-        if (props.config.offlineBackground) {
-          //language=SCSS
-          return `
-            background-image: url(${props.config.offlineBackground});
-            background-size: cover;
-            background-position: 80% 45%;
-            text-shadow:
-              0 0 5px #000,
-              -1px 0 1px ${props.config.colorPalette.common.primary};
-          `;
-        }
-        else {
-          //language=SCSS
-          return `background: radial-gradient(#162613, black)`;
-        }
-      }}
+    &:before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-size: contain;
+      background-repeat: no-repeat;
+      background-position: center;
+      background-image: ${props => `url(${props.config.offlineBackgroundImage})` || 'none'};
     }
   }
   

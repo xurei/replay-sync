@@ -79,7 +79,7 @@ class OverlaySelectStreamer extends React.Component {
               </div>
             </FlexChild>
             <FlexChild height={1} grow={1}>
-              <div className="fullh scroll-y select-streamer__scrollview" style={{margin: '0 auto', padding: '0 15px'}}>
+              <div className="fullh scroll-y select-streamer__scrollview">
                 {this.getFilteredStreamers()
                 .filter(login => {
                   const streamerName = streamersObj[login];
@@ -129,6 +129,8 @@ OverlaySelectStreamer = Styled(OverlaySelectStreamer)`
   }
 
   .select-streamer__scrollview {
+    margin: 0 auto;
+    padding: 0 20px 0 30px;
     &:before {
       content: "";
       display: block;
@@ -157,7 +159,7 @@ OverlaySelectStreamer = Styled(OverlaySelectStreamer)`
     display: inline-block;
     width: 150px;
     height: 185px;
-    margin: 0 16px 32px 16px;
+    margin: 0 20px 32px 20px;
     padding: 20px 0;
     //background: #222;
     text-align: center;
