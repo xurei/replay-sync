@@ -30,7 +30,7 @@ class Timeline extends React.Component {
     const vods = Object.values(props.vods || {});
     
     if (vods.length === 0) {
-      return 'ERR';
+      return '';
     }
     else {
       return (

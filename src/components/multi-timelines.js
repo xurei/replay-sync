@@ -101,18 +101,20 @@ class MultiTimelines extends React.Component {
                     </a>
                   ) : (
                     <span>
+                      <span className="multitimeline__streamer-controls">
+                        <button className="multitimeline__remove-button" onClick={() => props.onRemoveStreamer(streamer.name)}>
+                        −
+                        </button>
+                        {' '}
+                        <button className="multitimeline__visible-button" onClick={() => props.onToggleStreamerVisibility(streamer.name)}>
+                          {streamer.visible ? (
+                            <IconEyeOpen color="#cccccc" size={14}/>
+                          ) : (
+                            <IconEyeClosed color="#cccccc" size={14}/>
+                          )}
+                        </button>
+                      </span>
                       {streamer.name}
-                      <button className="multitimeline__visible-button" onClick={() => props.onToggleStreamerVisibility(streamer.name)}>
-                        {streamer.visible ? (
-                          <IconEyeOpen color="#cccccc" size={14}/>
-                        ) : (
-                          <IconEyeClosed color="#cccccc" size={14}/>
-                        )}
-                      </button>
-                      {' '}
-                      <button className="multitimeline__remove-button" onClick={() => props.onRemoveStreamer(streamer.name)}>
-                      −
-                      </button>
                     </span>
                   )}
                   
@@ -425,6 +427,12 @@ MultiTimelines = Styled(MultiTimelines)`
       &.confirmed {
         color: #a732e3;
       }
+    }
+    
+    .multitimeline__streamer-controls {
+      float: right;
+      width: 42px;
+      line-height: 10px;
     }
 
     .multitimeline__day-block {
