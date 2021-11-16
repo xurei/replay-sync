@@ -1,3 +1,6 @@
+## Version 0.4.0 - Nouvelle interface !
+- **Ravalement de facade** L'interface a été retravaillée pour un meilleur rendu et plus de place pour les vidéos.
+
 ## Version 0.3.4 - Bugfixes de la timeline
 - **Des jours et des jours** Les blocs de jours s'affichent correctement.
 - **Et à la fin c'est quelle heure ?** L'heure affichée à la sélection est affichée sur la droite.
