@@ -4,8 +4,8 @@ import Styled from 'styled-components';
 
 import { OverlayWrapper } from './overlay-wrapper';
 import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
-import { IconTipeee } from './icon-tipeee';
 import { IconGithub } from './icon-github';
+import { IconUtip } from './icon-utip';
 
 class OverlayDonate extends React.Component {
   static propTypes = {
@@ -26,11 +26,10 @@ class OverlayDonate extends React.Component {
                 Vous pouvez faire une donation ici : <br/>
                 <br/>
                 <div className="d-inline-block" style={{width: '20%'}}>
-                  <a href="https://fr.tipeee.com/xureilab" target="_blank" rel="noreferrer">
-                    <IconTipeee color={props.config.colorPalette.common.primary} size={80}/>
+                  <a href="https://utip.io/xurei" target="_blank" rel="noreferrer">
+                    <IconUtip color={props.config.colorPalette.common.primary} size={50}/>
                     <br/>
-                    <br/>
-                    Tipeee
+                    Utip
                   </a>
                 </div>
                 <div className="d-inline-block" style={{width: '30%'}}>
