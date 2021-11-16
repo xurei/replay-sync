@@ -310,7 +310,7 @@ class PlayerView extends React.Component {
                 </FlexChild>
               </FlexLayout>
             </FlexChild>
-            <FlexChild grow={0} height={30}>
+            <FlexChild grow={0} height={20}>
               <div className="text-center">
                 <div className="player-view__global-time">
                   {formatDateTimeSeconds(state.global_time)}
@@ -437,13 +437,12 @@ PlayerView = Styled(PlayerView)`
   
   .player-view__global-time {
     font-size: 14.8px;
-    line-height: 40px;
-    padding-left: 10px;
+    line-height: 18px;
   }
   
   .player-view__logo-wrapper {
     text-align: center;
-    padding-top: 5px;
+    padding-top: 8px;
   }
   
   .player-view__controls__buttons {
