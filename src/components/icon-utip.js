@@ -14,8 +14,6 @@ class IconUtip extends React.Component {
     const props = this.props;
     const color = props.color || '#000';
     const size = props.size || 32;
-    const css_filter = colorize.colorize(color);
-    console.log(css_filter);
     
     return (
       <span className={`d-inline-block ${props.className || ''}`}>
