@@ -32,17 +32,4 @@ class IconUtip extends React.Component {
   }
 }
 
-//language=SCSS
-IconUtip = Styled(IconUtip)`
-& {
-    > img {
-      ${props => {
-        const color = props.color || '#000';
-        const css_filter = colorize.colorize(color);
-        return css_filter.filter;
-      }}
-    }
-}
-`;
-
 export { IconUtip };
