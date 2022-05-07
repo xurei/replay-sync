@@ -2,8 +2,9 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
-import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
 import { MultiTimelines } from './components/multi-timelines';
+
+import { style } from './App.css.js';
 
 let metaByStreamer = null;
 
@@ -21,6 +22,7 @@ class StatsView extends React.Component {
     
     return (
       <div className={props.className}>
+        <style>{style}</style>
         <MultiTimelines
           config={props.config}
           streamersObj={props.streamersObj}

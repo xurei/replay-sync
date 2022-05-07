@@ -22,7 +22,7 @@ class Timeline extends React.Component {
   
   get totalLength() {
     const props = this.props;
-    return props.config.endTimestamp - props.config.startTimestamp;
+    return props.config.timeFrames[0].endTimestamp - props.config.timeFrames[0].startTimestamp;
   }
   
   render() {
@@ -41,7 +41,7 @@ class Timeline extends React.Component {
             {props.statsMode && vods.map(vod => {
               return (
                 <div key={vod.id} className={`timeline__vod-block original`} style={{
-                  left: `${(vod.created_ts-props.config.startTimestamp)*100 / this.totalLength}%`,
+                  left: `${(vod.created_ts-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
                   width: `${vod.duration_ms_orig*100 / this.totalLength}%`,
                 }}>
                 </div>
@@ -52,7 +52,7 @@ class Timeline extends React.Component {
                 <div key={vod.id}
                   className={`timeline__vod-block ${vod.permanent_id ? 'persisted' + (vod.permanent_id.confirmed ? ' confirmed':'') + (vod.permanent_id.error ? ' error':'') : ''} ${props.disabled ? ' disabled': ''}`}
                   style={{
-                    left: `${(vod.createdTs-props.config.startTimestamp)*100 / this.totalLength}%`,
+                    left: `${(vod.createdTs-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
                     width: `${vod.duration_ms*100 / this.totalLength}%`,
                   }}
                 />
@@ -61,7 +61,7 @@ class Timeline extends React.Component {
             {watchedBlocks.map(watchedBlock => {
               return (
                 <div key={watchedBlock.begin} className={`timeline__watched-block`} style={{
-                  left: `${(watchedBlock.begin-props.config.startTimestamp)*100 / this.totalLength}%`,
+                  left: `${(watchedBlock.begin-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
                   width: `3%`,
                 }}>
                   {/*Math.floor(vod.duration_ms/3600000 * 10) / 10*/}
@@ -79,7 +79,7 @@ class Timeline extends React.Component {
     const props = this.props;
     return (
       <div className="timeline__time-bar" style={{
-        left: `${(props.time-props.config.startTimestamp)*100 / this.totalLength}%`,
+        left: `${(props.time-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
       }}/>
     );
   }

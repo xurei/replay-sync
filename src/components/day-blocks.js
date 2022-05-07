@@ -14,8 +14,8 @@ class DayBlocks extends React.Component {
   render() {
     const props = this.props;
     const contents = props.contents || [];
-    const startTimestamp = props.config.startTimestamp;
-    const endTimestamp = props.config.endTimestamp;
+    const startTimestamp = props.config.timeFrames[0].startTimestamp;
+    const endTimestamp = props.config.timeFrames[0].endTimestamp;
     const totalLength = endTimestamp - startTimestamp;
     
     const elements = [];

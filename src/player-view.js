@@ -90,8 +90,8 @@ class PlayerView extends React.Component {
   constructor(props) {
     super(props);
     metaByStreamer = props.metaByStreamer;
-    this.initialDayOfYear = getDayOfYear(props.config.startTimestamp);
-    this.state.global_time = props.config.startTimestamp;
+    this.initialDayOfYear = getDayOfYear(props.config.timeFrames[0].startTimestamp);
+    this.state.global_time = props.config.timeFrames[0].startTimestamp;
     this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
     this.handleAddStreamer = this.handleAddStreamer.bind(this);
     this.handleTimeChange = this.handleTimeChange.bind(this);

@@ -45,7 +45,7 @@ class MultiTimelines extends React.Component {
   
   get totalLength() {
     const props = this.props;
-    return props.config.endTimestamp - props.config.startTimestamp;
+    return props.config.timeFrames[0].endTimestamp - props.config.timeFrames[0].startTimestamp;
   }
   
   constructor(props) {
@@ -177,7 +177,7 @@ class MultiTimelines extends React.Component {
     const props = this.props;
     return (
       <div className="multitimeline__time-bar current" style={{
-        left: `${(props.time-props.config.startTimestamp)*100 / this.totalLength}%`,
+        left: `${(props.time-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
       }}/>
     );
   }
@@ -193,7 +193,7 @@ class MultiTimelines extends React.Component {
       const selectTime = this.getTargetTime(state.cursorPosition);
       return (
         <div className="multitimeline__time-bar select" style={{
-          left: `${(selectTime-props.config.startTimestamp)*100 / this.totalLength}%`,
+          left: `${(selectTime-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
         }}>
           <div className={`select-timecode ${state.cursorPosition > 0.9 ? 'select-timecode__right' : 'select-timecode__left'}`}>{formatFullTime(selectTime)}</div>
         </div>
@@ -206,10 +206,10 @@ class MultiTimelines extends React.Component {
     const daysContents = [];
     let i = 1;
     
-    const nbDays = (props.config.endTimestamp - props.config.startTimestamp) / (1000*3600*24);
+    const nbDays = (props.config.timeFrames[0].endTimestamp - props.config.timeFrames[0].startTimestamp) / (1000*3600*24);
     const dayLabel = nbDays < 30 ? 'Jour ' : 'J' ;
     
-    for (let time=props.config.startTimestamp; time <= props.config.endTimestamp; time += 1000*3600*24) {
+    for (let time=props.config.timeFrames[0].startTimestamp; time <= props.config.timeFrames[0].endTimestamp; time += 1000*3600*24) {
       daysContents.push(<div className="multitimeline__day-block text-center">
         {dayLabel}{i}
       </div>);
@@ -230,7 +230,7 @@ class MultiTimelines extends React.Component {
   
   getTargetTime(ratio) {
     const props = this.props;
-    return ratio * this.totalLength + props.config.startTimestamp;
+    return ratio * this.totalLength + props.config.timeFrames[0].startTimestamp;
   }
   
   handleVisibilityToggle(e)  {
