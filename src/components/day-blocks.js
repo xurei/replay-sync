@@ -1,52 +1,60 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
-import { addDays } from 'date-fns/esm';
-import { atMidnigth } from '../date-util';
+import { buildDaysArray } from '../timeline-util';
+import deepEqual from 'deep-eql';
 
 class DayBlocks extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
-    contents: PropTypes.arrayOf(PropTypes.node),
+    showLabel: PropTypes.bool,
+    width: PropTypes.number,
     height: PropTypes.number,
+    className: PropTypes.string,
   };
   
   render() {
     const props = this.props;
-    const contents = props.contents || [];
-    const startTimestamp = props.config.timeFrames[0].startTimestamp;
-    const endTimestamp = props.config.timeFrames[0].endTimestamp;
-    const totalLength = endTimestamp - startTimestamp;
     
-    const elements = [];
-    let curTimestamp = startTimestamp;
-    let index = 0;
-    while (curTimestamp < endTimestamp) {
-      const nextTimestamp = atMidnigth(addDays(new Date(curTimestamp), 1)).getTime();
-      const content = contents[index] || null;
-      const dayLength = nextTimestamp - curTimestamp;
-      elements.push(
-        <div key={curTimestamp} className="day-blocks__day-block" style={{
-          left: `${(curTimestamp-startTimestamp)*100 / totalLength}%`,
-          width: `${100*dayLength/totalLength}%`,
-          height: props.height || 18,
-        }}>
-          {content}
-        </div>
-      );
-      curTimestamp = nextTimestamp;
-      ++index;
-    }
+    const daysArray = buildDaysArray(props.config.timeFrames);
+  
+    const totalLength = daysArray.reduce((acc, dayObj) => {
+      if (dayObj.type === 'ellipsis') {
+        return acc;
+      }
+      else {
+        return acc + dayObj.duration;
+      }
+    }, 0);
     
+    let curLeftRatio = 0;
     return (
       <div className={props.className}>
-        {elements}
+        {daysArray.map(dayObj => {
+          const divW = dayObj.duration / totalLength;
+          const out = (
+            <div key={dayObj.start} className="day-blocks__day-block" style={{
+              left: `${curLeftRatio*100}%`,
+              width: `${divW*100}%`,
+              borderLeft: dayObj.firstOfTimeFrame ? 'solid 1px #888' : 'none',
+              height: props.height || 18,
+            }}>
+              {props.showLabel && (
+                <div className="text-center" style={{paddingTop: '5px', fontSize:'0.8em'}}>
+                  {divW*props.width > 60 ? `Jour ${dayObj.index}`: `J${dayObj.index}`}
+                </div>
+              )}
+            </div>
+          );
+          curLeftRatio += divW;
+          return out;
+        })}
       </div>
     );
   }
   
   shouldComponentUpdate(nextProps) {
-    return false; // ?
+    return !deepEqual(this.props, nextProps);
   }
 }
 
@@ -55,7 +63,6 @@ DayBlocks = Styled(DayBlocks)`
 & {
   .day-blocks__day-block {
     position: absolute;
-    width: 1px;
 
     &:nth-child(2n) {
       background: #191919;

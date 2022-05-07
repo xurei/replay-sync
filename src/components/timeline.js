@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
 import { DayBlocks } from './day-blocks';
+import { buildDaysArray } from '../timeline-util';
 
 //TODO move inside the props
 const watchedBlocks = [
@@ -20,14 +21,32 @@ class Timeline extends React.Component {
     disabled: PropTypes.bool,
   };
   
-  get totalLength() {
+  calculateLeft(timestamp, totalLength) {
     const props = this.props;
-    return props.config.timeFrames[0].endTimestamp - props.config.timeFrames[0].startTimestamp;
+    let out = 0;
+    for (let timeframe of props.config.timeFrames) {
+      if (timeframe.startTimestamp <= timestamp && timestamp <= timeframe.endTimestamp) {
+        return out + (timestamp - timeframe.startTimestamp) / totalLength;
+      }
+      else {
+        out += (timeframe.endTimestamp - timeframe.startTimestamp) / totalLength;
+      }
+    }
   }
   
   render() {
     const props = this.props;
     const vods = Object.values(props.vods || {});
+    
+    const daysArray = buildDaysArray(props.config.timeFrames);
+    const totalLength = daysArray.reduce((acc, dayObj) => {
+      if (dayObj.type === 'ellipsis') {
+        return acc;
+      }
+      else {
+        return acc + dayObj.duration;
+      }
+    }, 0);
     
     if (vods.length === 0) {
       return '';
@@ -39,49 +58,42 @@ class Timeline extends React.Component {
             <DayBlocks config={props.config}/>
             <div className="timeline__base-line"/>
             {props.statsMode && vods.map(vod => {
+              const left = this.calculateLeft(vod.created_ts, totalLength);
               return (
                 <div key={vod.id} className={`timeline__vod-block original`} style={{
-                  left: `${(vod.created_ts-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
-                  width: `${vod.duration_ms_orig*100 / this.totalLength}%`,
+                  left: `${left*100}%`,
+                  width: `${vod.duration_ms_orig*100 / totalLength}%`,
                 }}>
                 </div>
               );
             })}
             {vods.map(vod => {
+              const left = this.calculateLeft(vod.created_ts, totalLength);
               return (
                 <div key={vod.id}
                   className={`timeline__vod-block ${vod.permanent_id ? 'persisted' + (vod.permanent_id.confirmed ? ' confirmed':'') + (vod.permanent_id.error ? ' error':'') : ''} ${props.disabled ? ' disabled': ''}`}
                   style={{
-                    left: `${(vod.createdTs-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
-                    width: `${vod.duration_ms*100 / this.totalLength}%`,
+                    left: `${left*100}%`,
+                    width: `${vod.duration_ms*100 / totalLength}%`,
                   }}
                 />
               );
             })}
-            {watchedBlocks.map(watchedBlock => {
-              return (
-                <div key={watchedBlock.begin} className={`timeline__watched-block`} style={{
-                  left: `${(watchedBlock.begin-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
-                  width: `3%`,
-                }}>
-                  {/*Math.floor(vod.duration_ms/3600000 * 10) / 10*/}
-                </div>
-              );
-            })}
-            {this.renderCurrentTime()}
+            {/*{watchedBlocks.map(watchedBlock => {*/}
+            {/*  const left = this.calculateLeft(vod.created_ts, totalLength);*/}
+            {/*  return (*/}
+            {/*    <div key={watchedBlock.begin} className={`timeline__watched-block`} style={{*/}
+            {/*      left: `${left*100}%`,*/}
+            {/*      width: `3%`,*/}
+            {/*    }}>*/}
+            {/*      /!*Math.floor(vod.duration_ms/3600000 * 10) / 10*!/*/}
+            {/*    </div>*/}
+            {/*  );*/}
+            {/*})}*/}
           </div>
         </div>
       );
     }
-  }
-  
-  renderCurrentTime() {
-    const props = this.props;
-    return (
-      <div className="timeline__time-bar" style={{
-        left: `${(props.time-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
-      }}/>
-    );
   }
   
   shouldComponentUpdate(nextProps) {

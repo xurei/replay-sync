@@ -10,6 +10,9 @@ import { IconEyeClosed } from './icon-eye-closed';
 import { IconEyeOpen } from './icon-eye-open';
 import { mergeTimelines } from '../timelines-util';
 import { formatFullTime } from '../date-util';
+import { buildDaysArray } from '../timeline-util';
+
+const LEFT_PANE_W = 160;
 
 const zoomDecrement = 0.8;
 const maxZoom = 1/Math.pow(zoomDecrement, 17);
@@ -38,14 +41,24 @@ class MultiTimelines extends React.Component {
     zoom: 1,
     horizontalScroll: 0,
     visible: true,
+    screenWidth: window.innerWidth,
   };
   
   streamerNames = [];
   everyoneVideos = [];
+  resizeListener = null;
   
   get totalLength() {
     const props = this.props;
-    return props.config.timeFrames[0].endTimestamp - props.config.timeFrames[0].startTimestamp;
+    const daysArray = buildDaysArray(props.config.timeFrames);
+    return daysArray.reduce((acc, dayObj) => {
+      if (dayObj.type === 'ellipsis') {
+        return acc;
+      }
+      else {
+        return acc + dayObj.duration;
+      }
+    }, 0);
   }
   
   constructor(props) {
@@ -62,6 +75,16 @@ class MultiTimelines extends React.Component {
     this.everyoneVideos = mergeTimelines(metaByStreamer, this.streamerNames);
   }
   
+  componentDidMount() {
+    this.resizeListener = () => {
+      this.setState(state => ({
+        ...state,
+        screenWidth: window.innerWidth,
+      }));
+    };
+    window.addEventListener('resize', this.resizeListener);
+  }
+  
   componentWillUpdate(prevProps, prevState, snapshot) {
     const props = this.props;
     const streamerNames = props.streamers.map(s => s.name);
@@ -69,6 +92,10 @@ class MultiTimelines extends React.Component {
       this.streamerNames = streamerNames;
       this.everyoneVideos = mergeTimelines(metaByStreamer, this.streamerNames);
     }
+  }
+  
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.resizeListener);
   }
   
   render() {
@@ -175,9 +202,22 @@ class MultiTimelines extends React.Component {
   
   renderCurrentTime() {
     const props = this.props;
+  
+    let left = 0;
+    const totalLength = this.totalLength;
+    for (let timeframe of props.config.timeFrames) {
+      if (timeframe.startTimestamp <= props.time && props.time <= timeframe.endTimestamp) {
+        left += (props.time - timeframe.startTimestamp) / totalLength;
+        break;
+      }
+      else {
+        left += (timeframe.endTimestamp - timeframe.startTimestamp) / totalLength;
+      }
+    }
+    
     return (
       <div className="multitimeline__time-bar current" style={{
-        left: `${(props.time-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
+        left: `${left*100}%`,
       }}/>
     );
   }
@@ -193,7 +233,8 @@ class MultiTimelines extends React.Component {
       const selectTime = this.getTargetTime(state.cursorPosition);
       return (
         <div className="multitimeline__time-bar select" style={{
-          left: `${(selectTime-props.config.timeFrames[0].startTimestamp)*100 / this.totalLength}%`,
+          left: `${state.cursorPosition*100}%`,
+          marginLeft: -1,
         }}>
           <div className={`select-timecode ${state.cursorPosition > 0.9 ? 'select-timecode__right' : 'select-timecode__left'}`}>{formatFullTime(selectTime)}</div>
         </div>
@@ -203,21 +244,9 @@ class MultiTimelines extends React.Component {
   
   renderDays() {
     const props = this.props;
-    const daysContents = [];
-    let i = 1;
-    
-    const nbDays = (props.config.timeFrames[0].endTimestamp - props.config.timeFrames[0].startTimestamp) / (1000*3600*24);
-    const dayLabel = nbDays < 30 ? 'Jour ' : 'J' ;
-    
-    for (let time=props.config.timeFrames[0].startTimestamp; time <= props.config.timeFrames[0].endTimestamp; time += 1000*3600*24) {
-      daysContents.push(<div className="multitimeline__day-block text-center">
-        {dayLabel}{i}
-      </div>);
-      i++;
-    }
     
     return (
-      <DayBlocks config={props.config} contents={daysContents} height={30} />
+      <DayBlocks config={props.config} showLabel={true} width={this.state.screenWidth - LEFT_PANE_W} height={30} />
     );
   }
   
@@ -230,7 +259,19 @@ class MultiTimelines extends React.Component {
   
   getTargetTime(ratio) {
     const props = this.props;
-    return ratio * this.totalLength + props.config.timeFrames[0].startTimestamp;
+    let curLeft = 0;
+    const totalLength = this.totalLength;
+    let curRatio = ratio;
+    for (let timeframe of props.config.timeFrames) {
+      const timeframeRatio = (timeframe.endTimestamp - timeframe.startTimestamp) / totalLength;
+      if (curLeft <= ratio && ratio <= curLeft+timeframeRatio) {
+        return timeframe.startTimestamp + curRatio * totalLength;
+      }
+      else {
+        curLeft += timeframeRatio;
+        curRatio -= timeframeRatio;
+      }
+    }
   }
   
   handleVisibilityToggle(e)  {
@@ -257,13 +298,11 @@ class MultiTimelines extends React.Component {
   
   handleWheel(e) {
     const delta = e.deltaY;
-    //console.log(`wheel ${delta}`);
     const zoomDirection = delta > 0 ? zoomDecrement : 1/zoomDecrement;
     this.setState(state => {
       const newZoom = Math.min(maxZoom, Math.max(1, state.zoom * zoomDirection));
       const addedWidth = newZoom - state.zoom;
       const newHorizontalScroll = (newZoom === 1) ? 0 : state.horizontalScroll + state.cursorPosition*addedWidth;
-      //console.log('cursor pos', state.cursorPosition);
       return {
         ...state,
         zoom: newZoom,
@@ -295,7 +334,7 @@ MultiTimelines = Styled(MultiTimelines)`
       z-index: 99;
       background: #0E0E10;
       padding-bottom: 3px;
-      width: 160px;
+      width: ${LEFT_PANE_W}px;
     }
 
     .multitimeline__days {
