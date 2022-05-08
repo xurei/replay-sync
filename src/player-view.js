@@ -103,7 +103,7 @@ class PlayerView extends React.Component {
   }
   
   componentDidMount() {
-    this.parseLocation();
+    this.parseShareLink();
     global.addEventListener('keydown', e => {
       if(e.which === 27) {
         this.setState(state => ({
@@ -133,7 +133,7 @@ class PlayerView extends React.Component {
     };
   }
   
-  parseLocation() {
+  parseShareLink() {
     const hash = document.location.hash.substr(1).split('&');
   
     // J115T01:13:11 => 2021-04-23T12:34:56+02:00
@@ -142,24 +142,10 @@ class PlayerView extends React.Component {
     }
     else {
       try {
-        const timecode = hash[0].split('T');
-        
-        let targetDate = new Date('2021-01-01T12:00:00Z'); // FIXME quid du 31/12 ? il faudrait trouver un moyen d'avoir l'année
-        targetDate = setDayOfYear(targetDate, parseInt(timecode[0].substr(1)) + this.initialDayOfYear - 1);
-        
-        const strInDate = targetDate.toISOString().substr(0,10); // --> "2021-04-26"  ~~T12:34:56Z~~
-        const h = parseInt(timecode[1].substr(0, 2));
-        const m = parseInt(timecode[1].substr(3, 2));
-        const s = parseInt(timecode[1].substr(6, 2));
-        const strInHour = `${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`;
-        console.log("IN  DATE", `${strInDate}T${strInHour}`);
-        //console.log("OUT DATE", targetDate.toISOString());
-        targetDate = zonedTimeToUtc(`${strInDate}T${strInHour}`, 'Europe/Paris');
-        const targetTs = targetDate.getTime();
         const targetStreamers = hash[1].split(':').filter(streamer => metaByStreamer[streamer]).map(this.createStreamerObj);
         this.setState(state => ({
           ...state,
-          global_time: targetTs,
+          global_time: parseInt(hash[0])*1000,
           streamers: targetStreamers,
           selectStreamerShown: false,
           changelogShown: false,
@@ -179,21 +165,11 @@ class PlayerView extends React.Component {
     const location = document.location;
     const port = (location.port && location.port !== '' && location.port !== 80 && location.port !== 443) ? `:${location.port}` : '';
     const baseUrl = `${location.protocol}//${location.hostname}${port}${location.pathname}`;
-    console.log(location.pathname);
-    console.log(baseUrl);
     
     const streamers = state.streamers.map(streamer=>streamer.name).join(':');
-    const global_time = state.global_time;
-    let targetDate = new Date(state.global_time);
-    const dayOfEvent = getDayOfYear(targetDate) - this.initialDayOfYear + 1;
-    const timeOfEvent = formatFullTime(targetDate);
-    console.log(`${formatFullTime(targetDate)}`);
-    console.log(dayOfEvent);
-    //targetDate = setDayOfYear(targetDate, getDayOfYear(targetDate) - this.initialDayOfYear + 1);
+    const dateOfEvent = Math.floor(state.global_time / 1000);
     
-    const out = `${baseUrl}#J${dayOfEvent}T${timeOfEvent}&${streamers}`;
-    console.log(out);
-    return out;
+    return `${baseUrl}#${dateOfEvent}&${streamers}`;
   }
   
   checkNoStreamerSelected() {
