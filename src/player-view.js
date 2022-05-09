@@ -2,8 +2,6 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import { FlexLayout, FlexChild } from 'xureact/lib/module/components/layout/flex-layout';
 import Styled from 'styled-components';
-import { zonedTimeToUtc } from 'date-fns-tz';
-import { setDayOfYear } from 'date-fns';
 import { MultiPlayers } from './components/multi-players';
 import { MultiTimelines } from './components/multi-timelines';
 import { OverlaySelectStreamer } from './components/overlay-select-streamer';
@@ -18,6 +16,9 @@ import { formatDateTimeSeconds, formatFullTime, getDayOfYear } from './date-util
 import { hasNewVersion, setLastVersionVisited } from './version';
 
 import { style } from './App.css.js';
+import { RTCService } from './services/rtc-service';
+import { IconPeople } from './components/icon-people';
+import { WatchPartyPanel } from './components/watch-party-panel';
 
 let metaByStreamer = null;
 
@@ -61,6 +62,7 @@ class PlayerView extends React.Component {
   };
   
   multiplayersRef = React.createRef();
+  watchPartyClientConnection = null;
   
   state = {
     global_time: null,
@@ -71,6 +73,10 @@ class PlayerView extends React.Component {
     donateShown: false,
     shareLink: '',
     selectStreamerShown: false,
+    watchPartyPanelShown: false,
+    watchPartyIsHost: false,
+    watchPartyHostId: null,
+    watchPartyEnabled: false,
     streamers: [
       //"bagherajones",
       //"horty_",
@@ -99,6 +105,7 @@ class PlayerView extends React.Component {
     this.handleDonateClick = this.handleDonateClick.bind(this);
     this.handleChangelogClick = this.handleChangelogClick.bind(this);
     this.handleThanksClick = this.handleThanksClick.bind(this);
+    this.handleStartWatchParty = this.handleStartWatchParty.bind(this);
     this.handleToggleStreamerVisibility = this.handleToggleStreamerVisibility.bind(this);
   }
   
@@ -114,7 +121,7 @@ class PlayerView extends React.Component {
           shareShown: false
         }));
       }
-    })
+    });
   }
   
   componentDidUpdate(prevProps, prevState, snapshot) {
@@ -141,35 +148,52 @@ class PlayerView extends React.Component {
       this.checkNoStreamerSelected();
     }
     else {
-      try {
-        const targetStreamers = hash[1].split(':').filter(streamer => metaByStreamer[streamer]).map(this.createStreamerObj);
+      if (hash[0] === 'watchparty') {
+        console.log('WATCH PARTY');
         this.setState(state => ({
           ...state,
-          global_time: parseInt(hash[0])*1000,
-          streamers: targetStreamers,
-          selectStreamerShown: false,
-          changelogShown: false,
+          watchPartyHostId: hash[1],
         }), () => {
-          //this.multiplayersRef.current.gotoTime(targetTs);
-          this.checkNoStreamerSelected();
+          this.connectToWatchParty();
         });
       }
-      catch (e) {
-        console.error(e);
+      else {
+        try {
+          const targetStreamers = hash[1].split(':').filter(streamer => metaByStreamer[streamer]).map(this.createStreamerObj);
+          this.setState(state => ({
+            ...state,
+            global_time: parseInt(hash[0])*1000,
+            streamers: targetStreamers,
+            selectStreamerShown: false,
+            changelogShown: false,
+          }), () => {
+            this.checkNoStreamerSelected();
+          });
+        }
+        catch (e) {
+          console.error(e);
+        }
       }
     }
   }
   
-  buildShareLink() {
-    const state = this.state;
+  get baseUrl() {
     const location = document.location;
     const port = (location.port && location.port !== '' && location.port !== 80 && location.port !== 443) ? `:${location.port}` : '';
-    const baseUrl = `${location.protocol}//${location.hostname}${port}${location.pathname}`;
-    
+    return `${location.protocol}//${location.hostname}${port}${location.pathname}`;
+  }
+  
+  buildShareLink() {
+    const state = this.state;
     const streamers = state.streamers.map(streamer=>streamer.name).join(':');
     const dateOfEvent = Math.floor(state.global_time / 1000);
     
-    return `${baseUrl}#${dateOfEvent}&${streamers}`;
+    return `${this.baseUrl}#${dateOfEvent}&${streamers}`;
+  }
+  
+  buildWatchPartyLink() {
+    const state = this.state;
+    return `${this.baseUrl}#watchparty&${state.watchPartyHostId}`;
   }
   
   checkNoStreamerSelected() {
@@ -260,6 +284,10 @@ class PlayerView extends React.Component {
                         <IconDonate size={22} color="inherit"/>
                         <div className="player-view__controls__button-text">Soutenir le projet</div>
                       </button>
+                      <button onClick={this.handleStartWatchParty} style={{fontSize: 16, lineHeight: '22px', paddingTop: 7}}>
+                        <IconPeople size={22} color={state.watchPartyPanelShown ? props.config.colorPalette.common.primary : 'inherit'}/>
+                        <div className="player-view__controls__button-text">Regarder ensemble</div>
+                      </button>
                       {/*<button onClick={this.handleThanksClick} style={{fontSize: 20}}>*/}
                       {/*  ♥*/}
                       {/*</button>*/}
@@ -268,18 +296,16 @@ class PlayerView extends React.Component {
                 </FlexChild>
                 <FlexChild grow={1} width={1}>
                   <div className="fullh">
+                    {state.watchPartyPanelShown && (
+                      <WatchPartyPanel ready={state.watchPartyHostId !== null} link={this.buildWatchPartyLink()} />
+                    )}
                     <MultiPlayers
                       config={props.config}
                       metaByVid={props.metaByVid}
                       ref={this.multiplayersRef}
                       global_time={this.state.global_time}
                       streamers={streamers}
-                      onTimeUpdate={time => this.setState(state => {
-                        return ({
-                          ...state,
-                          global_time: time,
-                        });
-                      })}
+                      onTimeUpdate={this.handleTimeChange}
                       onRemovePlayer={this.handleRemovePlayer}
                     />
                   </div>
@@ -335,10 +361,14 @@ class PlayerView extends React.Component {
   }
   
   handleTimeChange(targetTime) {
+    console.log('handleTimeChange');
     this.setState(state => ({
       ...state,
       global_time: targetTime,
     }));
+    if (this.state.watchPartyIsHost) {
+      RTCService.broadcastTime(targetTime);
+    }
   }
   
   handleToggleStreamerVisibility(streamerToToggle) {
@@ -388,6 +418,54 @@ class PlayerView extends React.Component {
       ...state,
       donateShown: true,
     }));
+  }
+  
+  handleStartWatchParty() {
+    this.setState(state => ({
+      ...state,
+      watchPartyPanelShown: !state.watchPartyPanelShown,
+    }));
+    if (!this.state.watchPartyHostId) {
+      this.startWatchParty();
+    }
+  }
+  
+  startWatchParty() {
+    const state = this.state;
+    RTCService.initHost().then(hostId => {
+      console.log("RTC HOST ID: ", hostId);
+      this.setState(state => ({
+        ...state,
+        watchPartyIsHost: true,
+        watchPartyHostId: hostId,
+      }));
+    }).then(() => {
+      return this.connectToWatchParty();
+    }).then(() => {
+      setTimeout(() => {
+        RTCService.broadcastTime(state.global_time);
+      }, 1000);
+      return true; //RTCService.broadcastTime(state.global_time);
+    });
+  }
+  
+  connectToWatchParty() {
+    const state = this.state;
+    return RTCService.initClient(state.watchPartyHostId).then(connection => {
+      this.watchPartyClientConnection = connection;
+      connection.on('data', (data) => {
+        console.log('[CLIENT] Received data: ', data);
+        if (!state.watchPartyIsHost) {
+          if (data.type === 'currentTime') {
+            this.setState(state => ({
+              ...state,
+              global_time: data.data,
+            }));
+          }
+        }
+        //RTCService.handleMessage(peerId, data);
+      });
+    });
   }
 }
 

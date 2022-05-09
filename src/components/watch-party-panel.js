@@ -2,12 +2,11 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
-import { OverlayWrapper } from './overlay-wrapper';
 
-class OverlayShare extends React.Component {
+class WatchPartyPanel extends React.Component {
   static propTypes = {
-    onClose: PropTypes.func.isRequired,
     link: PropTypes.string.isRequired,
+    ready: PropTypes.bool.isRequired,
   };
   
   state = {
@@ -23,15 +22,20 @@ class OverlayShare extends React.Component {
     const props = this.props;
     const state = this.state;
     return (
-      <OverlayWrapper width={'700px'} onClose={props.onClose}>
-        <div className={props.className}>
-          <h2>Lien de partage</h2>
-          <input readOnly type="text" value={props.link} onClick={this.handleCopyLink}/><br/>
-          <div className="copied-message">
-            {state.copied ? 'Lien copié !' : ''}
+      <div className={`${props.className} fullh`}>
+        <h3 className="text-center">Regarder Ensemble</h3>
+        {!props.ready ? (
+          <p className="text-center">Chargement...</p>
+        ) : (
+          <div className="text-center">
+            <p>Envoyez ce lien pour partager votre session et regarder les POV en sync avec vos amis.</p>
+            <input readOnly type="text" value={props.link} onClick={this.handleCopyLink}/><br/>
+            <div className="copied-message">
+              {state.copied ? 'Lien copié !' : ''}
+            </div>
           </div>
-        </div>
-      </OverlayWrapper>
+        )}
+      </div>
     );
   }
   
@@ -51,16 +55,18 @@ class OverlayShare extends React.Component {
   }
   
   shouldComponentUpdate(nextProps, nextState) {
-      return !deepEqual(this.props, nextProps) || !deepEqual(this.state, nextState);
+    return !deepEqual(this.props, nextProps) || !deepEqual(this.state, nextState);
   }
 }
-
 //language=SCSS
-OverlayShare = Styled(OverlayShare)`
+WatchPartyPanel = Styled(WatchPartyPanel)`
 & {
-  text-align: center;
-  padding: 20px 20px;
-  
+  position: absolute;
+  z-index: 50;
+  width: 360px;
+  background: rgba(0,0,0, 0.6);
+  padding: 30px 10px;
+
   input[type="text"] {
     width: 100%;
     text-align: center;
@@ -73,5 +79,4 @@ OverlayShare = Styled(OverlayShare)`
   }
 }
 `;
-
-export { OverlayShare };
+export { WatchPartyPanel };
