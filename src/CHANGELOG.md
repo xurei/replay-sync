@@ -1,5 +1,5 @@
-## Version 0.4.1 - Timelines avec ellipse
-- **Les retrouvailles** Il est possible de créer plusieurs time frames avec ellipse entre deux événements (Félicitations Miguel et Kim !)
+## Version 0.5.0 - Timelines avec ellipse
+- **Les retrouvailles** Il est possible de créer plusieurs time frames séparées par une ellipse (Félicitations Miguel et Kim !)
 
 ## Version 0.4.0 - Nouvelle interface !
 - **Ravalement de facade** L'interface a été retravaillée pour un meilleur rendu et plus de place pour les vidéos.
