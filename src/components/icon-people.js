@@ -4,6 +4,7 @@ import deepEqual from 'deep-eql';
 
 class IconPeople extends React.Component {
   static propTypes = {
+    className: PropTypes.string,
     color: PropTypes.string,
     size: PropTypes.number,
   };

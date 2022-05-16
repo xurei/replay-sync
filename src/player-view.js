@@ -14,6 +14,7 @@ import { IconGift } from './components/icon-gift';
 import { OverlayDonate } from './components/overlay-donate';
 import { formatDateTimeSeconds, formatFullTime, getDayOfYear } from './date-util';
 import { hasNewVersion, setLastVersionVisited } from './version';
+import autobind from 'abind';
 
 import { style } from './App.css.js';
 import { RTCService } from './services/rtc-service';
@@ -56,7 +57,9 @@ function findNextVOD(streamerName, global_time) {
 
 class PlayerView extends React.Component {
   static propTypes = {
+    className: PropTypes.string,
     config: PropTypes.object.isRequired,
+    streamersObj: PropTypes.object.isRequired,
     metaByStreamer: PropTypes.object.isRequired,
     metaByVid: PropTypes.object.isRequired,
   };
@@ -75,7 +78,7 @@ class PlayerView extends React.Component {
     selectStreamerShown: false,
     watchPartyPanelShown: false,
     watchPartyIsHost: false,
-    watchPartyHostId: null,
+    watchPartyRoomId: null,
     watchPartyEnabled: false,
     streamers: [
       //"bagherajones",
@@ -98,15 +101,7 @@ class PlayerView extends React.Component {
     metaByStreamer = props.metaByStreamer;
     this.initialDayOfYear = getDayOfYear(props.config.timeFrames[0].startTimestamp);
     this.state.global_time = props.config.timeFrames[0].startTimestamp;
-    this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
-    this.handleAddStreamer = this.handleAddStreamer.bind(this);
-    this.handleTimeChange = this.handleTimeChange.bind(this);
-    this.handleShareClick = this.handleShareClick.bind(this);
-    this.handleDonateClick = this.handleDonateClick.bind(this);
-    this.handleChangelogClick = this.handleChangelogClick.bind(this);
-    this.handleThanksClick = this.handleThanksClick.bind(this);
-    this.handleStartWatchParty = this.handleStartWatchParty.bind(this);
-    this.handleToggleStreamerVisibility = this.handleToggleStreamerVisibility.bind(this);
+    autobind(this);
   }
   
   componentDidMount() {
@@ -152,7 +147,7 @@ class PlayerView extends React.Component {
         console.log('WATCH PARTY');
         this.setState(state => ({
           ...state,
-          watchPartyHostId: hash[1],
+          watchPartyRoomId: hash[1],
         }), () => {
           this.connectToWatchParty();
         });
@@ -179,7 +174,7 @@ class PlayerView extends React.Component {
   
   get baseUrl() {
     const location = document.location;
-    const port = (location.port && location.port !== '' && location.port !== 80 && location.port !== 443) ? `:${location.port}` : '';
+    const port = (location.port && location.port !== '') ? `:${location.port}` : '';
     return `${location.protocol}//${location.hostname}${port}${location.pathname}`;
   }
   
@@ -193,7 +188,7 @@ class PlayerView extends React.Component {
   
   buildWatchPartyLink() {
     const state = this.state;
-    return `${this.baseUrl}#watchparty&${state.watchPartyHostId}`;
+    return `${this.baseUrl}#watchparty&${state.watchPartyRoomId}`;
   }
   
   checkNoStreamerSelected() {
@@ -268,7 +263,7 @@ class PlayerView extends React.Component {
               <FlexLayout direction="row">
                 <FlexChild width={48} grow={0}>
                   <div className="player-view__logo-wrapper">
-                    <img src={props.config.logo.size64} alt={props.config.appName} width={32} height={32}/>
+                    <img src={props.config.logo.size64} alt={props.config['appName']} width={32} height={32}/>
                   </div>
                   {!this.anyOverlayShown && (
                     <div className="player-view__controls__buttons">
@@ -284,7 +279,7 @@ class PlayerView extends React.Component {
                         <IconDonate size={22} color="inherit"/>
                         <div className="player-view__controls__button-text">Soutenir le projet</div>
                       </button>
-                      <button onClick={this.handleStartWatchParty} style={{fontSize: 16, lineHeight: '22px', paddingTop: 7}}>
+                      <button onClick={this.handleToggleWatchPartyPanel} style={{fontSize: 16, lineHeight: '22px', paddingTop: 7}}>
                         <IconPeople size={22} color={state.watchPartyPanelShown ? props.config.colorPalette.common.primary : 'inherit'}/>
                         <div className="player-view__controls__button-text">Regarder ensemble</div>
                       </button>
@@ -297,13 +292,21 @@ class PlayerView extends React.Component {
                 <FlexChild grow={1} width={1}>
                   <div className="fullh">
                     {state.watchPartyPanelShown && (
-                      <WatchPartyPanel ready={state.watchPartyHostId !== null} link={this.buildWatchPartyLink()} />
+                      <WatchPartyPanel
+                        config={props.config}
+                        enabled={state.watchPartyEnabled}
+                        ready={state.watchPartyRoomId !== null}
+                        link={this.buildWatchPartyLink()}
+                        roomId={state.watchPartyRoomId}
+                        onCreateRoom={this.handleCreateWatchPartyRoom}
+                        onJoinRoom={this.handleJoinWatchPartyRoom}
+                      />
                     )}
                     <MultiPlayers
                       config={props.config}
                       metaByVid={props.metaByVid}
                       ref={this.multiplayersRef}
-                      global_time={this.state.global_time}
+                      global_time={state.global_time}
                       streamers={streamers}
                       onTimeUpdate={this.handleTimeChange}
                       onRemovePlayer={this.handleRemovePlayer}
@@ -351,6 +354,32 @@ class PlayerView extends React.Component {
     }));
   }
   
+  handleCreateWatchPartyRoom() {
+    this.startWatchParty()
+    .then((roomId) => {
+      console.log('ROOM ID', roomId);
+      this.setState(state => ({
+        ...state,
+        watchPartyIsHost: true,
+        watchPartyRoomId: roomId,
+        watchPartyEnabled: true,
+      }));
+    });
+  }
+  
+  handleJoinWatchPartyRoom() {
+    const roomId = prompt('Quel est l\'id du salon ?');
+    if (roomId) {
+      this.setState(state => ({
+        ...state,
+        watchPartyRoomId: roomId,
+        watchPartyEnabled: true,
+      }), () => {
+        this.connectToWatchParty();
+      });
+    }
+  }
+  
   handleRemovePlayer(streamerToRemove) {
     this.setState(state => {
       return {
@@ -366,7 +395,7 @@ class PlayerView extends React.Component {
       ...state,
       global_time: targetTime,
     }));
-    if (this.state.watchPartyIsHost) {
+    if (this.state.watchPartyEnabled) {
       RTCService.broadcastTime(targetTime);
     }
   }
@@ -420,14 +449,11 @@ class PlayerView extends React.Component {
     }));
   }
   
-  handleStartWatchParty() {
+  handleToggleWatchPartyPanel() {
     this.setState(state => ({
       ...state,
       watchPartyPanelShown: !state.watchPartyPanelShown,
     }));
-    if (!this.state.watchPartyHostId) {
-      this.startWatchParty();
-    }
   }
   
   startWatchParty() {
@@ -534,13 +560,13 @@ PlayerView = Styled(PlayerView)`
         opacity: 0.9;
         &:before {
           content : "";
-          width: 1px;
-          height: 1px;
+          width: 7px;
+          height: 14px;
           position: absolute;
-          top: 8px;
-          left: -12px;
-          border: solid 5px transparent;
-          border-right-color: ${props => props.config.colorPalette.button.background};
+          top: 50%;
+          left: -7px;
+          transform: translate(-0.5px, -50%);
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' height='14px' viewBox='0 0 64 128'%3E%3Cpath style='fill:${props => encodeURIComponent(props.config.colorPalette.button.background)}' d='M64 128 32 96 .001 64l32-32L64 0v64z'/%3E%3C/svg%3E");
         }
       }
       

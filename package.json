@@ -14,6 +14,7 @@
     "build:module": "BABEL_ENV=module node_modules/.bin/babel src -d lib/module"
   },
   "dependencies": {
+    "abind": "^1.0.5",
     "date-fns": "^2.21.2",
     "date-fns-tz": "^1.1.4",
     "deep-eql": "^4.0.0",
