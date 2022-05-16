@@ -23,21 +23,21 @@ export const RTCService = {
             let returned = false;
             this.peerHost = RTCService.newPeer();
             this.peerHost.on('open', (id) => {
-                console.log(`[HOST] My id is ${id}`);
+                console.debug(`[HOST] My id is ${id}`);
 
                 this.peerHost.on('connection', (connection) => {
                     const peerId = connection.peer;
-                    connection.on('data', (data) => {
-                        console.log('[HOST] Received', data);
+                    /*connection.on('data', (data) => {
+                        console.debug('[HOST] Received', data);
                         RTCService.handleMessage(peerId, data);
-                    });
+                    });*/
 
-                    console.log(`[HOST] ${connection.peer} connected !`);
+                    console.debug(`[HOST] ${connection.peer} connected !`);
 
                     const peerConnection = this.peerHost.connect(connection.peer);
                     peerConnection.on('open', () => {
                         this.clientConnections.push(peerConnection);
-                        console.log(`[HOST] Connection with ${connection.peer} open !`);
+                        console.debug(`[HOST] Connection with ${connection.peer} open !`);
                         //RTCService.broadcast();
                     });
                 });
@@ -46,7 +46,7 @@ export const RTCService = {
                 resolve(id);
             });
             this.peerHost.on('error', function(err) {
-                console.log(`[HOST] ERROR`, err);
+                console.error(`[HOST] ERROR`, err);
                 if (!returned) {
                     reject(err);
                 }
@@ -59,24 +59,25 @@ export const RTCService = {
             let returned = false;
             this.peerClient = RTCService.newPeer();
             this.peerClient.on('error', (err) => {
-                console.log(`[CLIENT] ERROR`, err);
+                console.debug(`[CLIENT] ERROR`, err);
                 if (!returned) {
                     reject(err);
                 }
             });
             this.peerClient.on('open', (id) => {
-                console.log(`[CLIENT] My id is ${id}`);
+                console.debug(`[CLIENT] My id is ${id}`);
 
                 this.peerClient.on('connection', (connection) => {
                     const peerId = connection.peer;
-                    console.log('[CLIENT] Connected to host');
+                    console.debug(`[CLIENT] Connected to host ${peerId}`);
+                    console.log(connection);
                     resolve(connection);
                 });
 
-                console.log(`[CLIENT] Trying to connect with ${hostId}`);
+                console.debug(`[CLIENT] Trying to connect with ${hostId}`);
                 this.connection = this.peerClient.connect(hostId);
                 this.connection.on('open', () => {
-                    console.log(`[CLIENT] Connection with ${hostId} open !`);
+                    console.debug(`[CLIENT] Connection with ${hostId} open !`);
                     /*this.connection.send({
                         type: 'SetPlayerName',
                         data: 'plop',
@@ -84,21 +85,21 @@ export const RTCService = {
                     returned = true;
                 });
                 this.connection.on('error', (err) => {
-                    console.log(`[CLIENT] ERROR`, err);
+                    console.error(`[CLIENT] ERROR`, err);
                 });
             });
         });
     },
 
-    broadcastTime(timestamp) {
-        console.log('broadcastTime');
+    broadcastData(data) {
+        const payload = {
+            type: 'currentTime',
+            userId: this.peerClient.id,
+            data: data,
+        };
+        this.connection.send(payload);
         this.clientConnections.forEach((connection) => {
-            console.log('broadcastTime');
-            //const clientState = this.formatForClient(connection.peer, gameState);
-            connection.send({
-                type: 'currentTime',
-                data: timestamp,
-            });
+            connection.send(payload);
         });
     },
 
@@ -107,41 +108,5 @@ export const RTCService = {
             type: type,
             data: data
         });
-    },
-
-    handleMessage(peerId, message) {
-        console.log('handleMessage', peerId, message);
-        //switch (message.type) {
-        //    // Sent by the host
-        //    case 'GameState': {
-        //        console.log('UPDATE GAMESTATE');
-        //        gameStore.dispatch({
-        //            type: 'setGame',
-        //            data: message.data,
-        //        });
-        //        break;
-        //    }
-        //
-        //    // Sent to the host - never received by a non host
-        //    case 'SetPlayerName': {
-        //        console.log('SET PLAYER NAME', message);
-        //        GameHostService.setPlayerName(peerId, message.data);
-        //        this.broadcast();
-        //        break;
-        //    }
-        //    case 'Answer': {
-        //        console.log('ANSWER');
-        //        GameHostService.answer(peerId, message.data);
-        //        this.broadcast();
-        //        break;
-        //    }
-        //    case 'Vote': {
-        //        console.log('VOTE');
-        //        GameHostService.vote(peerId, message.data);
-        //        this.broadcast();
-        //        break;
-        //    }
-        //
-        //}
     },
 };

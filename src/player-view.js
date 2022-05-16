@@ -17,9 +17,9 @@ import { hasNewVersion, setLastVersionVisited } from './version';
 import autobind from 'abind';
 
 import { style } from './App.css.js';
-import { RTCService } from './services/rtc-service';
 import { IconPeople } from './components/icon-people';
 import { WatchPartyPanel } from './components/watch-party-panel';
+import { WatchpartyService } from './services/watchparty-service';
 
 let metaByStreamer = null;
 
@@ -149,7 +149,7 @@ class PlayerView extends React.Component {
           ...state,
           watchPartyRoomId: hash[1],
         }), () => {
-          this.connectToWatchParty();
+          WatchpartyService.connectToWatchParty(hash[1]);
         });
       }
       else {
@@ -355,7 +355,7 @@ class PlayerView extends React.Component {
   }
   
   handleCreateWatchPartyRoom() {
-    this.startWatchParty()
+    WatchpartyService.startWatchParty()
     .then((roomId) => {
       console.log('ROOM ID', roomId);
       this.setState(state => ({
@@ -375,7 +375,7 @@ class PlayerView extends React.Component {
         watchPartyRoomId: roomId,
         watchPartyEnabled: true,
       }), () => {
-        this.connectToWatchParty();
+        WatchpartyService.connectToWatchParty(roomId);
       });
     }
   }
@@ -396,7 +396,8 @@ class PlayerView extends React.Component {
       global_time: targetTime,
     }));
     if (this.state.watchPartyEnabled) {
-      RTCService.broadcastTime(targetTime);
+      console.log('broadcast');
+      WatchpartyService.broadcastTime(targetTime);
     }
   }
   
@@ -454,44 +455,6 @@ class PlayerView extends React.Component {
       ...state,
       watchPartyPanelShown: !state.watchPartyPanelShown,
     }));
-  }
-  
-  startWatchParty() {
-    const state = this.state;
-    RTCService.initHost().then(hostId => {
-      console.log("RTC HOST ID: ", hostId);
-      this.setState(state => ({
-        ...state,
-        watchPartyIsHost: true,
-        watchPartyHostId: hostId,
-      }));
-    }).then(() => {
-      return this.connectToWatchParty();
-    }).then(() => {
-      setTimeout(() => {
-        RTCService.broadcastTime(state.global_time);
-      }, 1000);
-      return true; //RTCService.broadcastTime(state.global_time);
-    });
-  }
-  
-  connectToWatchParty() {
-    const state = this.state;
-    return RTCService.initClient(state.watchPartyHostId).then(connection => {
-      this.watchPartyClientConnection = connection;
-      connection.on('data', (data) => {
-        console.log('[CLIENT] Received data: ', data);
-        if (!state.watchPartyIsHost) {
-          if (data.type === 'currentTime') {
-            this.setState(state => ({
-              ...state,
-              global_time: data.data,
-            }));
-          }
-        }
-        //RTCService.handleMessage(peerId, data);
-      });
-    });
   }
 }
 
