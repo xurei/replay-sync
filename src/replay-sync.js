@@ -2,6 +2,7 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import { StatsView } from './stats-view';
 import { PlayerView } from './player-view';
+import { v4 as uuid } from 'uuid';
 import { prepareMetadata } from './metadata-util';
 import { migrateConfig } from './config-util';
 
@@ -21,6 +22,18 @@ class ReplaySync extends React.Component {
     const path = location.pathname.split('/');
     path.shift();
     console.log(path);
+  
+    // TODO reactivate tracking link
+    //let tid = localStorage.get('tid');
+    //if (!tid) {
+    //  tid = uuid();
+    //  localStorage.set('tid', tid);
+    //}
+    //fetch(`/api/t?tid=${tid}&rnd=${Math.floor(Math.random()*10000000)}`)
+    //.catch(e => {
+    //  /* Silent fail */
+    //});
+    
     if (path.length === 0) {
       //TODO Landing page
     }
@@ -39,8 +52,8 @@ class ReplaySync extends React.Component {
         
         //TODO remove logo injection and find a way to put it differently
         data.config.logo = {
-          size64: `${process.env.PUBLIC_URL}/logo64.png`,
-          size192: `${process.env.PUBLIC_URL}/logo192.png`,
+          size64: `/logo64.png`,
+          size192: `/logo192.png`,
         };
         
         console.log(data.config);

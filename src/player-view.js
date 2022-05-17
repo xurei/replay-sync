@@ -106,6 +106,7 @@ class PlayerView extends React.Component {
   
   componentDidMount() {
     this.parseShareLink();
+    const global = window || global || {};
     global.addEventListener('keydown', e => {
       if(e.which === 27) {
         this.setState(state => ({
@@ -486,6 +487,7 @@ PlayerView = Styled(PlayerView)`
   .player-view__logo-wrapper {
     text-align: center;
     padding-top: 8px;
+    overflow: hidden;
   }
   
   .player-view__controls__buttons {

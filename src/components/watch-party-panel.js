@@ -2,7 +2,7 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
-import { WatchPartyPeerControls } from './watch-party-peer-controls';
+import WatchPartyPeerControls from './watch-party-peer-controls';
 
 class WatchPartyPanel extends React.Component {
   static propTypes = {

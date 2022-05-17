@@ -26,7 +26,7 @@ class WatchPartyPeerControls extends React.Component {
         <FlexLayout>
           <FlexChild grow={1} className="peer-details">
             <span className="username">👤 Jean-Michel</span>
-            <span className="time-info">+5m34s ahead</span>
+            <span className="time-info">+5m44s ahead</span>
             {/*<span className="time-info">2021-04-28 15:28:12</span>*/}
             {/*<span className="time-info">HortyUnderscore, BagheraJones, Alexclick</span>*/}
           </FlexChild>
@@ -130,4 +130,4 @@ WatchPartyPeerControls = Styled(WatchPartyPeerControls)`
   }
 `;
 
-export { WatchPartyPeerControls };
+export default WatchPartyPeerControls;

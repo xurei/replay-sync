@@ -1,8 +1,6 @@
 import localStorage from 'store/dist/store.legacy';
 
-import _package from '../package.json';
-const version = _package.version;
-_package = null; //Free useless memory as we only need the version field
+const version = __APP_VERSION__;
 let lastVersionVisited = localStorage.get('lastVersionVisited');
 
 function hasNewVersion() {
@@ -13,5 +11,7 @@ function setLastVersionVisited() {
   localStorage.set('lastVersionVisited', version);
   lastVersionVisited = version;
 }
+
+console.debug(`REPLAY SYNC VERSION ${version}`);
 
 export { version, lastVersionVisited, hasNewVersion, setLastVersionVisited };

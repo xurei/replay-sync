@@ -1,0 +1,12 @@
+{
+  "functions": {
+    "api/t.js": {
+      "memory": 128,
+      "maxDuration": 5
+    },
+    "api/config.js": {
+      "memory": 256,
+      "maxDuration": 10
+    }
+  }
+}

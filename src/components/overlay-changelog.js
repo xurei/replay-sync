@@ -3,12 +3,13 @@ import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
 
 import { OverlayWrapper } from './overlay-wrapper';
-import changelog from '../CHANGELOG.md';
 import ReactMarkdown from 'react-markdown';
 import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
 import { IconDiscord } from './icon-discord';
 import { IconTwitter } from './icon-twitter';
 import { IconTwitch } from './icon-twitch';
+
+const changelog = __CHANGELOG__;
 
 class OverlayChangelog extends React.Component {
   static propTypes = {
