@@ -1,54 +1,78 @@
 import { RTCService } from './rtc-service';
 
+/*
+
+Messages :
+- current timestamp            Envoyé lors d'un changement de temps dans une VOD ? Ou de façon régulière
+  + playing status
+  + timelines
+- peer name                    Envoyé à la connection et en cas de changement de nom
+- j'ai perdu mon pantalon      Bisou DesmuCS
+
+- add marker                   Envoyé à la création d'un marqueur (v2)
+
+*/
+
 export const WatchpartyService = {
   clientConnection: null,
   roomId: null,
-  onReceiveTimeCb: null,
+  onReceivePlayingStatusCb: null,
   onPeerConnectCb: null,
+  onPeerDisconnectCb: null,
+  
+  init() {
+    RTCService.onData(WatchpartyService.onData);
+  },
   
   startWatchParty() {
-    return RTCService.initHost().then(roomId => {
-      console.log("RTC HOST ID: ", roomId);
-      return this.connectToWatchParty(roomId);
-    });
+    return RTCService.init();
   },
   
   connectToWatchParty(roomId) {
-    return (
-      RTCService.initClient(roomId)
-      .then(connection => {
-        this.clientConnection = connection;
-        connection.on('data', (data, ...args) => {
-          console.log('[CLIENT] Received data: ', data);
-          console.log(args);
-          /*if (!state.watchPartyIsHost) {
-            if (data.type === 'currentTime') {
-              this.setState(state => ({
-                ...state,
-                global_time: data.data,
-              }));
-            }
-          }*/
-          //RTCService.handleMessage(peerId, data);
-        });
-        return connection.peer;
-      })
-    );
+    RTCService.init()
+    .then((peerId) => {
+      return RTCService.addConnectionTo(roomId);
+    });
+  },
+  
+  onData(data) {
+    console.log('[WATCHPARTY] data received', data);
+    
+    if (data.data.type === 'playingStatus') {
+      WatchpartyService.onReceivePlayingStatusCb(data.peerId, data.data);
+    }
+    else {
+      console.log('[WATCHPARTY] Unhandled message ', data.data.type);
+    }
+    
+    /*if (!state.watchPartyIsHost) {
+      if (data.type === 'currentTime') {
+        this.setState(state => ({
+          ...state,
+          global_time: data.data,
+        }));
+      }
+    }*/
   },
   
   broadcastTime(timestamp) {
-    RTCService.broadcastData(timestamp);
+    RTCService.broadcast({
+      type: 'playingStatus',
+      timestamp: timestamp,
+      //TODO add playingState,
+      //TODO add streamers,
+    });
   },
   
-  onReceiveTime(callback) {
-    this.onReceiveTimeCb = callback;
+  onReceivePlayingStatus(callback) {
+    WatchpartyService.onReceivePlayingStatusCb = callback;
   },
   
   onPeerConnect(callback) {
-    this.onPeerConnectCb = callback;
+    WatchpartyService.onPeerConnectCb = callback;
   },
   
   onPeerDisconnect(callback) {
-    this.onPeerDisconnectCb = callback;
+    WatchpartyService.onPeerDisconnectCb = callback;
   },
 };

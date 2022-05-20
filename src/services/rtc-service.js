@@ -2,10 +2,13 @@
 import Peer from 'peerjs';
 
 export const RTCService = {
+    peerToutCourt: null,
     peerHost: null,
     peerClient: null,
     connection: null,
     clientConnections: [],
+    peerId: null,
+    onDataCallback: null,
     
     newPeer() {
         return new Peer({
@@ -17,96 +20,103 @@ export const RTCService = {
             debug: 1,
         });
     },
-
-    initHost() {
+    
+    init() {
         return new Promise((resolve, reject) => {
             let returned = false;
-            this.peerHost = RTCService.newPeer();
-            this.peerHost.on('open', (id) => {
-                console.debug(`[HOST] My id is ${id}`);
+            this.peerToutCourt = RTCService.newPeer();
+            this.peerToutCourt.on('open', (id) => {
+                // Connection with the PeerServer established, Peer id is known
+                console.debug(`[PEER] My id is ${id}`);
 
-                this.peerHost.on('connection', (connection) => {
-                    const peerId = connection.peer;
-                    /*connection.on('data', (data) => {
-                        console.debug('[HOST] Received', data);
-                        RTCService.handleMessage(peerId, data);
-                    });*/
-
-                    console.debug(`[HOST] ${connection.peer} connected !`);
-
-                    const peerConnection = this.peerHost.connect(connection.peer);
-                    peerConnection.on('open', () => {
-                        this.clientConnections.push(peerConnection);
-                        console.debug(`[HOST] Connection with ${connection.peer} open !`);
-                        //RTCService.broadcast();
-                    });
-                });
-
+                this.peerId = id;
                 returned = true;
                 resolve(id);
             });
-            this.peerHost.on('error', function(err) {
-                console.error(`[HOST] ERROR`, err);
+    
+            this.peerToutCourt.on('connection', (connection) => {
+                // A new connection with a remote peer has been established
+                const peerId = connection.peer;
+                console.debug(`[PEER] ${peerId} connected !`);
+    
+                this.faisUnTrucAvecLaConnection(connection);
+                
+                // TODO this is probably not reliable - maybe use a query system from the peer connecting ?
+                setTimeout(() => {
+                    this.sendOtherConnections(connection);
+                }, 100);
+            });
+            
+            this.peerToutCourt.on('error', function(err) {
+                console.error(`[PEER] ERROR`, err);
                 if (!returned) {
                     reject(err);
                 }
             });
         });
     },
-
-    initClient(hostId) {
-        return new Promise((resolve, reject) => {
-            let returned = false;
-            this.peerClient = RTCService.newPeer();
-            this.peerClient.on('error', (err) => {
-                console.debug(`[CLIENT] ERROR`, err);
-                if (!returned) {
-                    reject(err);
+    
+    addConnectionTo(remotePeerId) {
+        const connection = this.peerToutCourt.connect(remotePeerId);
+        connection.on('open', () => {
+            console.debug(`[PEER] Connection with ${connection.peer} established !`);
+            this.faisUnTrucAvecLaConnection(connection);
+        });
+    },
+    
+    faisUnTrucAvecLaConnection(connection) {
+        connection.on('data', (packet) => {
+            console.log('[PEER] received data', packet);
+            
+            if (packet.rtcMessageType === 'otherConnection') {
+                const hasConnectionAlready = this.clientConnections.findIndex(otherConnection => otherConnection.peer === packet.peerId) > -1;
+                if (!hasConnectionAlready) {
+                    console.log('[PEER] Other connection received: ', packet.peerId);
+                    this.addConnectionTo(packet.peerId);
                 }
-            });
-            this.peerClient.on('open', (id) => {
-                console.debug(`[CLIENT] My id is ${id}`);
-
-                this.peerClient.on('connection', (connection) => {
-                    const peerId = connection.peer;
-                    console.debug(`[CLIENT] Connected to host ${peerId}`);
-                    console.log(connection);
-                    resolve(connection);
+            }
+            else {
+                if (this.onDataCallback) {
+                    this.onDataCallback({
+                        peerId: connection.peer,
+                        data: packet.data,
+                    });
+                }
+                else {
+                    console.warn('[PEER] onDataCallback not defined - ignored');
+                }
+            }
+        });
+        
+        this.clientConnections.push(connection);
+        
+        /*setTimeout(() => {
+            connection.send({message:"bonjour copain"});
+        }, 10);*/
+    },
+    
+    sendOtherConnections(connection) {
+        this.clientConnections.forEach(otherConnection => {
+            if (otherConnection.peer !== connection.peer) {
+                console.log('[PEER] send other connection');
+                connection.send({
+                    rtcMessageType: 'otherConnection',
+                    peerId: otherConnection.peer,
                 });
-
-                console.debug(`[CLIENT] Trying to connect with ${hostId}`);
-                this.connection = this.peerClient.connect(hostId);
-                this.connection.on('open', () => {
-                    console.debug(`[CLIENT] Connection with ${hostId} open !`);
-                    /*this.connection.send({
-                        type: 'SetPlayerName',
-                        data: 'plop',
-                    });*/
-                    returned = true;
-                });
-                this.connection.on('error', (err) => {
-                    console.error(`[CLIENT] ERROR`, err);
-                });
-            });
+            }
         });
     },
 
-    broadcastData(data) {
-        const payload = {
-            type: 'currentTime',
-            userId: this.peerClient.id,
-            data: data,
-        };
-        this.connection.send(payload);
+    broadcast(data) {
         this.clientConnections.forEach((connection) => {
-            connection.send(payload);
+            connection.send({
+                rtcMessageType: 'data',
+                data: data,
+            });
         });
     },
-
-    send(type, data) {
-        this.connection.send({
-            type: type,
-            data: data
-        });
+    
+    onData(onDataCallback) {
+        this.onDataCallback = onDataCallback;
     },
 };

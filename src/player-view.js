@@ -107,6 +107,14 @@ class PlayerView extends React.Component {
   componentDidMount() {
     this.parseShareLink();
     const global = window || global || {};
+    WatchpartyService.init();
+    WatchpartyService.onReceivePlayingStatus((peerId, playingStatus) => {
+      // TODO change the time iff the peerId is marked as synchronized
+      this.setState(state => ({
+        ...state,
+        global_time: playingStatus.timestamp,
+      }));
+    });
     global.addEventListener('keydown', e => {
       if(e.which === 27) {
         this.setState(state => ({
