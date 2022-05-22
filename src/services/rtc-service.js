@@ -96,6 +96,7 @@ export const RTCService = {
     },
     
     sendOtherConnections(connection) {
+        //FIXME send only one message with all the other connections
         this.clientConnections.forEach(otherConnection => {
             if (otherConnection.peer !== connection.peer) {
                 console.log('[PEER] send other connection');

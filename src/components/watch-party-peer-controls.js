@@ -12,6 +12,8 @@ class WatchPartyPeerControls extends React.Component {
   static propTypes = {
     className: PropTypes.string,
     config: PropTypes.object.isRequired,
+    peerId: PropTypes.string.isRequired,
+    peerData: PropTypes.object.isRequired,
   };
   
   constructor(props) {
@@ -25,8 +27,8 @@ class WatchPartyPeerControls extends React.Component {
       <li className={`${props.className} watchparty-peer-controls`}>
         <FlexLayout>
           <FlexChild grow={1} className="peer-details">
-            <span className="username">👤 Jean-Michel</span>
-            <span className="time-info">+5m44s ahead</span>
+            <span className="username">👤 {props.peerData.peerName || 'guest'}</span>
+            <span className="time-info">{props.peerData.timestamp}</span>
             {/*<span className="time-info">2021-04-28 15:28:12</span>*/}
             {/*<span className="time-info">HortyUnderscore, BagheraJones, Alexclick</span>*/}
           </FlexChild>

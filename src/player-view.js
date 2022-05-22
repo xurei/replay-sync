@@ -65,7 +65,6 @@ class PlayerView extends React.Component {
   };
   
   multiplayersRef = React.createRef();
-  watchPartyClientConnection = null;
   
   state = {
     global_time: null,
@@ -77,9 +76,7 @@ class PlayerView extends React.Component {
     shareLink: '',
     selectStreamerShown: false,
     watchPartyPanelShown: false,
-    watchPartyIsHost: false,
-    watchPartyRoomId: null,
-    watchPartyEnabled: false,
+    watchPartyEnabled: true,
     streamers: [
       //"bagherajones",
       //"horty_",
@@ -96,6 +93,12 @@ class PlayerView extends React.Component {
     );
   }
   
+  get baseUrl() {
+    const location = document.location;
+    const port = (location.port && location.port !== '') ? `:${location.port}` : '';
+    return `${location.protocol}//${location.hostname}${port}${location.pathname}`;
+  }
+  
   constructor(props) {
     super(props);
     metaByStreamer = props.metaByStreamer;
@@ -107,14 +110,6 @@ class PlayerView extends React.Component {
   componentDidMount() {
     this.parseShareLink();
     const global = window || global || {};
-    WatchpartyService.init();
-    WatchpartyService.onReceivePlayingStatus((peerId, playingStatus) => {
-      // TODO change the time iff the peerId is marked as synchronized
-      this.setState(state => ({
-        ...state,
-        global_time: playingStatus.timestamp,
-      }));
-    });
     global.addEventListener('keydown', e => {
       if(e.which === 27) {
         this.setState(state => ({
@@ -129,12 +124,7 @@ class PlayerView extends React.Component {
   }
   
   componentDidUpdate(prevProps, prevState, snapshot) {
-    const state = this.state;
     this.checkNoStreamerSelected();
-    let date = new Date(state.global_time);
-    const strDate = `J${getDayOfYear(date)-this.initialDayOfYear+1}T${formatFullTime(date)}`;
-    //strDate.substring(0, strDate.length-5)+'Z';
-    //document.location.hash = `${strDate}&${state.streamers.join(',')}`;
   }
   
   createStreamerObj(streamerName) {
@@ -153,6 +143,7 @@ class PlayerView extends React.Component {
     }
     else {
       if (hash[0] === 'watchparty') {
+        //FIXME this code is broken - needs fix
         console.log('WATCH PARTY');
         this.setState(state => ({
           ...state,
@@ -179,12 +170,6 @@ class PlayerView extends React.Component {
         }
       }
     }
-  }
-  
-  get baseUrl() {
-    const location = document.location;
-    const port = (location.port && location.port !== '') ? `:${location.port}` : '';
-    return `${location.protocol}//${location.hostname}${port}${location.pathname}`;
   }
   
   buildShareLink() {
@@ -300,17 +285,16 @@ class PlayerView extends React.Component {
                 </FlexChild>
                 <FlexChild grow={1} width={1}>
                   <div className="fullh">
-                    {state.watchPartyPanelShown && (
-                      <WatchPartyPanel
-                        config={props.config}
-                        enabled={state.watchPartyEnabled}
-                        ready={state.watchPartyRoomId !== null}
-                        link={this.buildWatchPartyLink()}
-                        roomId={state.watchPartyRoomId}
-                        onCreateRoom={this.handleCreateWatchPartyRoom}
-                        onJoinRoom={this.handleJoinWatchPartyRoom}
-                      />
-                    )}
+                    <WatchPartyPanel
+                      config={props.config}
+                      global_time={state.global_time}
+                      visible={state.watchPartyPanelShown}
+                      enabled={state.watchPartyEnabled}
+                      ready={state.watchPartyRoomId !== null}
+                      link={this.buildWatchPartyLink()}
+                      roomId={state.watchPartyRoomId}
+                      onEnabled={this.handleWatchPartyEnabled}
+                    />
                     <MultiPlayers
                       config={props.config}
                       metaByVid={props.metaByVid}
@@ -363,30 +347,11 @@ class PlayerView extends React.Component {
     }));
   }
   
-  handleCreateWatchPartyRoom() {
-    WatchpartyService.startWatchParty()
-    .then((roomId) => {
-      console.log('ROOM ID', roomId);
-      this.setState(state => ({
-        ...state,
-        watchPartyIsHost: true,
-        watchPartyRoomId: roomId,
-        watchPartyEnabled: true,
-      }));
-    });
-  }
-  
-  handleJoinWatchPartyRoom() {
-    const roomId = prompt('Quel est l\'id du salon ?');
-    if (roomId) {
-      this.setState(state => ({
-        ...state,
-        watchPartyRoomId: roomId,
-        watchPartyEnabled: true,
-      }), () => {
-        WatchpartyService.connectToWatchParty(roomId);
-      });
-    }
+  handleWatchPartyEnabled(isEnabled) {
+    this.setState(state => ({
+      ...state,
+      watchPartyEnabled: isEnabled,
+    }));
   }
   
   handleRemovePlayer(streamerToRemove) {
@@ -399,7 +364,6 @@ class PlayerView extends React.Component {
   }
   
   handleTimeChange(targetTime) {
-    console.log('handleTimeChange');
     this.setState(state => ({
       ...state,
       global_time: targetTime,
@@ -407,6 +371,7 @@ class PlayerView extends React.Component {
     if (this.state.watchPartyEnabled) {
       console.log('broadcast');
       WatchpartyService.broadcastTime(targetTime);
+      WatchpartyService.broadcastPeerName('Jean-Eude');
     }
   }
   

@@ -5,7 +5,7 @@ import { RTCService } from './rtc-service';
 Messages :
 - current timestamp            Envoyé lors d'un changement de temps dans une VOD ? Ou de façon régulière
   + playing status
-  + timelines
+  + timelines?
 - peer name                    Envoyé à la connection et en cas de changement de nom
 - j'ai perdu mon pantalon      Bisou DesmuCS
 
@@ -17,6 +17,7 @@ export const WatchpartyService = {
   clientConnection: null,
   roomId: null,
   onReceivePlayingStatusCb: null,
+  onReceivePeerNameCb: null,
   onPeerConnectCb: null,
   onPeerDisconnectCb: null,
   
@@ -29,9 +30,10 @@ export const WatchpartyService = {
   },
   
   connectToWatchParty(roomId) {
-    RTCService.init()
+    return RTCService.init()
     .then((peerId) => {
-      return RTCService.addConnectionTo(roomId);
+      RTCService.addConnectionTo(roomId)
+      return peerId;
     });
   },
   
@@ -40,6 +42,9 @@ export const WatchpartyService = {
     
     if (data.data.type === 'playingStatus') {
       WatchpartyService.onReceivePlayingStatusCb(data.peerId, data.data);
+    }
+    else if (data.data.type === 'peerName') {
+      WatchpartyService.onReceivePeerNameCb(data.peerId, data.data.peerName);
     }
     else {
       console.log('[WATCHPARTY] Unhandled message ', data.data.type);
@@ -64,8 +69,21 @@ export const WatchpartyService = {
     });
   },
   
+  broadcastPeerName(peerName) {
+    RTCService.broadcast({
+      type: 'peerName',
+      peerName: peerName,
+      //TODO add playingState,
+      //TODO add streamers,
+    });
+  },
+  
   onReceivePlayingStatus(callback) {
     WatchpartyService.onReceivePlayingStatusCb = callback;
+  },
+  
+  onReceivePeerName(callback) {
+    WatchpartyService.onReceivePeerNameCb = callback;
   },
   
   onPeerConnect(callback) {
