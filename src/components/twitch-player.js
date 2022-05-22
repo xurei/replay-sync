@@ -2,7 +2,8 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types';
 import deepEqual from 'deep-eql'; //eslint-disable-line no-unused-vars
 import { tsToVodTime } from '../time-util.js';
-import * as twitchEmbed from '../vendor/twitch_embed_v1';
+
+const global = window;
 
 class TwitchPlayer extends React.Component {
   static propTypes = {
