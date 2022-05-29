@@ -3,55 +3,29 @@ import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
 import { OverlayWrapper } from './overlay-wrapper';
+import { InputCopyText } from './input-copy-text';
 
 class OverlayShare extends React.Component {
   static propTypes = {
+    className: PropTypes.string,
     onClose: PropTypes.func.isRequired,
     link: PropTypes.string.isRequired,
   };
   
-  state = {
-    copied: false,
-  };
-  
-  constructor(props) {
-    super(props);
-    this.handleCopyLink = this.handleCopyLink.bind(this);
-  }
-  
   render() {
     const props = this.props;
-    const state = this.state;
     return (
       <OverlayWrapper width={'700px'} onClose={props.onClose}>
         <div className={props.className}>
           <h2>Lien de partage</h2>
-          <input readOnly type="text" value={props.link} onClick={this.handleCopyLink}/><br/>
-          <div className="copied-message">
-            {state.copied ? 'Lien copié !' : ''}
-          </div>
+          <InputCopyText className="share-input" value={props.link} copiedText="Lien copié !"/>
         </div>
       </OverlayWrapper>
     );
   }
   
-  handleCopyLink() {
-    const props = this.props;
-    navigator.clipboard.writeText(props.link);
-    this.setState(state => ({
-      ...state,
-      copied: true,
-    }));
-    setTimeout(() => {
-      this.setState(state => ({
-        ...state,
-        copied: false,
-      }));
-    }, 5000);
-  }
-  
-  shouldComponentUpdate(nextProps, nextState) {
-      return !deepEqual(this.props, nextProps) || !deepEqual(this.state, nextState);
+  shouldComponentUpdate(nextProps) {
+      return !deepEqual(this.props, nextProps);
   }
 }
 
@@ -61,15 +35,9 @@ OverlayShare = Styled(OverlayShare)`
   text-align: center;
   padding: 20px 20px;
   
-  input[type="text"] {
+  .share-input {
     width: 100%;
     text-align: center;
-    cursor: pointer;
-  }
-  
-  .copied-message {
-    margin-top: 3px;
-    height: 20px;
   }
 }
 `;

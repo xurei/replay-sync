@@ -8,6 +8,7 @@ import WatchPartyPeerControls from './watch-party-peer-controls';
 import { WatchpartyService } from '../services/watchparty-service';
 import autobind from 'abind';
 import { setSubState } from '../state-util';
+import { InputCopyText } from './input-copy-text';
 
 class WatchPartyPanel extends React.Component {
   static propTypes = {
@@ -22,7 +23,6 @@ class WatchPartyPanel extends React.Component {
   };
   
   state = {
-    copied: false,
     watchPartyRoomId: null,
     watchPartyEnabled: false,
     myPeerId: null,
@@ -31,7 +31,6 @@ class WatchPartyPanel extends React.Component {
   
   constructor(props) {
     super(props);
-    this.handleCopyLink = this.handleCopyLink.bind(this);
     autobind(this);
   }
   
@@ -81,7 +80,6 @@ class WatchPartyPanel extends React.Component {
   
   renderDisabledView() {
     const props = this.props;
-    const state = this.state;
     return (
       <div className={`${props.className} fullh disabled-view`}>
         <h3 className="text-center">Regarder Ensemble</h3>
@@ -105,10 +103,7 @@ class WatchPartyPanel extends React.Component {
         ) : (
           <div className="text-center">
             <p>Envoyez ce lien pour partager votre session et regarder les POV en sync avec vos amis.</p>
-            <input readOnly type="text" value={state.watchPartyRoomId} onClick={this.handleCopyLink}/><br/>
-            <div className="copied-message">
-              {state.copied ? 'Lien copié !' : ''}
-            </div>
+            <InputCopyText value={state.watchPartyRoomId || ''} copiedText="ID copié !"/>
           </div>
         )}
         <ul className="peers-list">
@@ -147,22 +142,6 @@ class WatchPartyPanel extends React.Component {
         this.props.onEnabled(this.state.watchPartyEnabled);
       });
     });
-  }
-  
-  handleCopyLink() {
-    const props = this.props;
-    const state = this.state;
-    navigator.clipboard.writeText(state.watchPartyRoomId);
-    this.setState(state => ({
-      ...state,
-      copied: true,
-    }));
-    setTimeout(() => {
-      this.setState(state => ({
-        ...state,
-        copied: false,
-      }));
-    }, 5000);
   }
   
   handleJoinWatchPartyRoom() {
@@ -210,11 +189,6 @@ WatchPartyPanel = Styled(WatchPartyPanel)`
     width: 100%;
     text-align: center;
     cursor: pointer;
-  }
-  
-  .copied-message {
-    margin-top: 3px;
-    height: 20px;
   }
   
   &.disabled-view button {
