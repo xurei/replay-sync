@@ -2,7 +2,7 @@
 import Peer from 'peerjs';
 
 export const RTCService = {
-    peerToutCourt: null,
+    myPeer: null,
     peerHost: null,
     peerClient: null,
     connection: null,
@@ -10,6 +10,7 @@ export const RTCService = {
     peerId: null,
     onDataCallback: null,
     onNewConnectionCallback: null,
+    onConnectionClosedCallback: null,
     
     newPeer() {
         return new Peer({
@@ -25,9 +26,9 @@ export const RTCService = {
     init() {
         return new Promise((resolve, reject) => {
             let returned = false;
-            this.peerToutCourt = RTCService.newPeer();
-            this.peerToutCourt.on('open', (id) => {
-                // Connection with the PeerServer established, Peer id is known
+            this.myPeer = RTCService.newPeer();
+            this.myPeer.on('open', (id) => {
+                // Connection with the main Peer established, Peer id is known
                 console.debug(`[PEER] My id is ${id}`);
 
                 this.peerId = id;
@@ -35,20 +36,15 @@ export const RTCService = {
                 resolve(id);
             });
     
-            this.peerToutCourt.on('connection', (connection) => {
+            this.myPeer.on('connection', (connection) => {
                 // A new connection with a remote peer has been established
                 const peerId = connection.peer;
                 console.debug(`[PEER] ${peerId} connected !`);
     
-                this.faisUnTrucAvecLaConnection(connection);
-                
-                // TODO this is probably not reliable - maybe use a query system from the peer connecting ?
-                setTimeout(() => {
-                    this.sendOtherConnections(connection);
-                }, 100);
+                this.bindConnection(connection);
             });
             
-            this.peerToutCourt.on('error', function(err) {
+            this.myPeer.on('error', function(err) {
                 console.error(`[PEER] ERROR`, err);
                 if (!returned) {
                     reject(err);
@@ -58,26 +54,46 @@ export const RTCService = {
     },
     
     addConnectionTo(remotePeerId) {
-        const connection = this.peerToutCourt.connect(remotePeerId);
+        const connection = this.myPeer.connect(remotePeerId);
         connection.on('open', () => {
             console.debug(`[PEER] Connection with ${connection.peer} established !`);
-            this.faisUnTrucAvecLaConnection(connection);
+            this.bindConnection(connection);
+            setTimeout(() => {
+                connection.send({
+                    rtcMessageType: 'requestOtherConnections',
+                    peerId: this.myPeer.peer,
+                });
+            }, 500);
         });
     },
     
-    faisUnTrucAvecLaConnection(connection) {
+    bindConnection(connection) {
+        connection.on('close', () => {
+            console.log(`CLOSED CONNECTION ${connection.peer}`);
+            if (this.onConnectionClosedCallback) {
+                this.onConnectionClosedCallback(connection.peer);
+            }
+        });
+        
         connection.on('data', (packet) => {
             console.log('[PEER] received data', packet);
             
-            if (packet.rtcMessageType === 'otherConnection') {
-                const hasConnectionAlready = this.clientConnections.findIndex(otherConnection => otherConnection.peer === packet.peerId) > -1;
-                if (!hasConnectionAlready) {
-                    console.log('[PEER] Other connection received: ', packet.peerId);
-                    this.addConnectionTo(packet.peerId);
-                }
+            if (packet.rtcMessageType === 'otherConnections') {
+                const peerIds = packet.peerIds;
+                peerIds.forEach(peerId => {
+                    const hasConnectionAlready = this.clientConnections.findIndex(otherConnection => otherConnection.peer === peerId) > -1;
+                    if (!hasConnectionAlready) {
+                        console.log('[PEER] Other connection received: ', peerId);
+                        this.addConnectionTo(peerId);
+                    }
+                });
+            }
+            else if (packet.rtcMessageType === 'requestOtherConnections') {
+                this.sendOtherConnections(connection);
             }
             else {
                 if (this.onDataCallback) {
+                    //noinspection JSValidateTypes
                     this.onDataCallback({
                         peerId: connection.peer,
                         data: packet.data,
@@ -92,7 +108,8 @@ export const RTCService = {
         this.clientConnections.push(connection);
         
         if (this.onNewConnectionCallback) {
-            this.onNewConnectionCallback(connection);
+            //noinspection JSValidateTypes
+            this.onNewConnectionCallback();
         }
         
         /*setTimeout(() => {
@@ -101,16 +118,17 @@ export const RTCService = {
     },
     
     sendOtherConnections(connection) {
-        //FIXME send only one message with all the other connections
+        const message = {
+            rtcMessageType: 'otherConnections',
+            peerIds: [],
+        };
         this.clientConnections.forEach(otherConnection => {
             if (otherConnection.peer !== connection.peer) {
-                console.log('[PEER] send other connection');
-                connection.send({
-                    rtcMessageType: 'otherConnection',
-                    peerId: otherConnection.peer,
-                });
+                console.log(`[PEER] send other connection ${otherConnection.peer}`);
+                message.peerIds.push(otherConnection.peer);
             }
         });
+        connection.send(message);
     },
 
     broadcast(data) {
@@ -128,5 +146,9 @@ export const RTCService = {
     
     onNewConnection(callback) {
         this.onNewConnectionCallback = callback;
+    },
+    
+    onConnectionClosed(callback) {
+        this.onConnectionClosedCallback = callback;
     },
 };

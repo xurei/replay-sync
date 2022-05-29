@@ -20,12 +20,12 @@ export const WatchpartyService = {
   roomId: null,
   onReceivePlayingStatusCb: null,
   onReceivePeerNameCb: null,
-  onPeerConnectCb: null,
   onPeerDisconnectCb: null,
   
   init() {
     RTCService.onData(WatchpartyService.handleData);
     RTCService.onNewConnection(WatchpartyService.handleNewConnection);
+    RTCService.onConnectionClosed(WatchpartyService.handleConnectionClosed);
   },
   
   startWatchParty() {
@@ -44,10 +44,16 @@ export const WatchpartyService = {
     console.log('[WATCHPARTY] data received', data);
     
     if (data.data.type === 'playingStatus') {
-      WatchpartyService.onReceivePlayingStatusCb(data.peerId, data.data);
+      if (WatchpartyService.onReceivePlayingStatusCb) {
+        //noinspection JSValidateTypes
+        WatchpartyService.onReceivePlayingStatusCb(data.peerId, data.data);
+      }
     }
     else if (data.data.type === 'peerName') {
-      WatchpartyService.onReceivePeerNameCb(data.peerId, data.data.peerName);
+      if (WatchpartyService.onReceivePlayingStatusCb) {
+        //noinspection JSValidateTypes
+        WatchpartyService.onReceivePeerNameCb(data.peerId, data.data.peerName);
+      }
     }
     else {
       console.log('[WATCHPARTY] Unhandled message ', data.data.type);
@@ -63,11 +69,16 @@ export const WatchpartyService = {
     }*/
   },
   
-  handleNewConnection(connection) {
+  handleNewConnection() {
     setTimeout(() => {
       WatchpartyService.broadcastPeerName(LocalStorageService.getUsername());
       WatchpartyService.broadcastTime(GlobalTimeService.getGlobalTime());
     }, 500);
+  },
+  
+  handleConnectionClosed(peerId) {
+    //noinspection JSValidateTypes
+    WatchpartyService.onPeerDisconnectCb(peerId);
   },
   
   broadcastTime(timestamp) {
@@ -94,10 +105,6 @@ export const WatchpartyService = {
   
   onReceivePeerName(callback) {
     WatchpartyService.onReceivePeerNameCb = callback;
-  },
-  
-  onPeerConnect(callback) {
-    WatchpartyService.onPeerConnectCb = callback;
   },
   
   onPeerDisconnect(callback) {

@@ -2,7 +2,6 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
-import localStorage from 'store/dist/store.legacy';
 //TODO random name generator
 import WatchPartyPeerControls from './watch-party-peer-controls';
 import { WatchpartyService } from '../services/watchparty-service';
@@ -63,6 +62,13 @@ class WatchPartyPanel extends React.Component {
         console.log(this.state);
       });
     });
+    WatchpartyService.onPeerDisconnect((peerId) => {
+      this.setState(setSubState('peers', peersState => {
+        const out = { ...peersState };
+        delete out[peerId];
+        return out;
+      }));
+    });
   }
   
   render() {
@@ -114,7 +120,12 @@ class WatchPartyPanel extends React.Component {
           <FlexLayout direction="row">
             <FlexChild width={80} style={{lineHeight: '52px'}}>Mon nom :</FlexChild>
             <FlexChild grow={1}>
-              <input className="watchparty-panel__my-username" type="text" value={state.myUsername} onChange={this.handleUsernameChange}/>
+              <input
+                className="watchparty-panel__my-username" type="text"
+                value={LocalStorageService.hasUsernameDefined() ? state.myUsername : ''}
+                placeholder={LocalStorageService.getRandomUsername()}
+                onChange={this.handleUsernameChange}
+              />
             </FlexChild>
           </FlexLayout>
         </div>
@@ -193,7 +204,7 @@ class WatchPartyPanel extends React.Component {
     LocalStorageService.setUsername(value);
     this.setState(state => ({
       ...state,
-      myUsername: value,
+      myUsername: LocalStorageService.getUsername(),
     }), () => {
       if (broadcastUsernameTimer) {
         clearTimeout(broadcastUsernameTimer);
