@@ -1,6 +1,5 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import localStorage from 'store/dist/store.legacy';
 import { ReplaySync } from './replay-sync';
 
 ReactDOM.render(

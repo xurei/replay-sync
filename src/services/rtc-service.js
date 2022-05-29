@@ -9,6 +9,7 @@ export const RTCService = {
     clientConnections: [],
     peerId: null,
     onDataCallback: null,
+    onNewConnectionCallback: null,
     
     newPeer() {
         return new Peer({
@@ -90,6 +91,10 @@ export const RTCService = {
         
         this.clientConnections.push(connection);
         
+        if (this.onNewConnectionCallback) {
+            this.onNewConnectionCallback(connection);
+        }
+        
         /*setTimeout(() => {
             connection.send({message:"bonjour copain"});
         }, 10);*/
@@ -119,5 +124,9 @@ export const RTCService = {
     
     onData(onDataCallback) {
         this.onDataCallback = onDataCallback;
+    },
+    
+    onNewConnection(callback) {
+        this.onNewConnectionCallback = callback;
     },
 };

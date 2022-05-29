@@ -19,7 +19,7 @@ class MultiPlayers extends React.Component {
     onTimeUpdate: PropTypes.func.isRequired,
     onRemovePlayer: PropTypes.func.isRequired,
     streamers: PropTypes.arrayOf(PropTypes.object).isRequired,
-    global_time: PropTypes.number.isRequired,
+    globalTime: PropTypes.number.isRequired,
   };
   
   state = {
@@ -135,7 +135,7 @@ class MultiPlayers extends React.Component {
               }
               //const Player = MockPlayer; //index === 0 ? TwitchPlayer : MockPlayer;
 
-              let expectedTime = props.global_time - videoMeta.createdTs/*+ player.delay*/;
+              let expectedTime = props.globalTime - videoMeta.createdTs/*+ player.delay*/;
               if (videoMeta.permanent_id && videoMeta.permanent_id.cut_start) {
                 expectedTime += videoMeta.permanent_id.cut_start;
               }
@@ -162,7 +162,7 @@ class MultiPlayers extends React.Component {
             }
             else {
               const videoMeta = metaByVid[streamer.next_video_id];
-              const nextVodTime = !videoMeta ? 0 : -Math.floor(props.global_time - videoMeta.createdTs);
+              const nextVodTime = !videoMeta ? 0 : -Math.floor(props.globalTime - videoMeta.createdTs);
               return (
                 <div key={index} className="multiplayers__player multiplayers__player-muted multiplayers__player-offline">
                   {this.renderPlayerOverlayControls(streamer, index)}
@@ -242,12 +242,12 @@ class MultiPlayers extends React.Component {
     const mainIndex = this.getMainIndex();
     if (mainIndex === index) {
       const videoMeta = metaByVid[this.props.streamers[index].video_id];
-      let global_time = videoMeta.createdTs + playerTime;
+      let globalTime = videoMeta.createdTs + playerTime;
       if (videoMeta.permanent_id && videoMeta.permanent_id.cut_start) {
-        global_time -= videoMeta.permanent_id.cut_start;
+        globalTime -= videoMeta.permanent_id.cut_start;
       }
-      if (props.global_time !== global_time) {
-        this.props.onTimeUpdate(global_time);
+      if (props.globalTime !== globalTime) {
+        this.props.onTimeUpdate(globalTime);
       }
     }
     if (state.players[index].muted !== isMuted) {
@@ -261,7 +261,7 @@ class MultiPlayers extends React.Component {
   
   handleFastForward(e) {
     const time = parseInt(e.currentTarget.getAttribute('data-time'));
-    this.props.onTimeUpdate(this.props.global_time+time);
+    this.props.onTimeUpdate(this.props.globalTime+time);
   }
   
   shouldComponentUpdate(nextProps, nextState) {

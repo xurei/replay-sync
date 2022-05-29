@@ -20,14 +20,15 @@ import { style } from './App.css.js';
 import { IconPeople } from './components/icon-people';
 import { WatchPartyPanel } from './components/watch-party-panel';
 import { WatchpartyService } from './services/watchparty-service';
+import { GlobalTimeService } from './services/global-time-service';
 
 let metaByStreamer = null;
 
-function findMatchingVOD(streamerName, global_time) {
+function findMatchingVOD(streamerName, globalTime) {
   const meta = Object.values(metaByStreamer[streamerName]);
   for (const vod of meta) {
     const createdTs = vod.createdTs;
-    if (createdTs <= global_time && global_time <= createdTs + vod.duration_ms - 3000) {
+    if (createdTs <= globalTime && globalTime <= createdTs + vod.duration_ms - 3000) {
       let vid = vod.id;
       if (vod.permanent_id) {
         vid = `${vod.permanent_id.id}<${vid}`;
@@ -37,14 +38,14 @@ function findMatchingVOD(streamerName, global_time) {
   }
   return null;
 }
-function findNextVOD(streamerName, global_time) {
+function findNextVOD(streamerName, globalTime) {
   const meta = Object.values(metaByStreamer[streamerName]);
   meta.sort((a,b) => {
     return a.createdTs - b.createdTs;
   });
   for (const vod of meta) {
     const createdTs = vod.createdTs;
-    if (createdTs > global_time) {
+    if (createdTs > globalTime) {
       let vid = vod.id;
       if (vod.permanent_id) {
         vid = `${vod.permanent_id.id}<${vid}`;
@@ -67,7 +68,7 @@ class PlayerView extends React.Component {
   multiplayersRef = React.createRef();
   
   state = {
-    global_time: null,
+    globalTime: null,
     switching: false,
     thanksShown: false,
     changelogShown: false,
@@ -103,7 +104,7 @@ class PlayerView extends React.Component {
     super(props);
     metaByStreamer = props.metaByStreamer;
     this.initialDayOfYear = getDayOfYear(props.config.timeFrames[0].startTimestamp);
-    this.state.global_time = props.config.timeFrames[0].startTimestamp;
+    this.state.globalTime = props.config.timeFrames[0].startTimestamp;
     autobind(this);
   }
   
@@ -157,11 +158,12 @@ class PlayerView extends React.Component {
           const targetStreamers = hash[1].split(':').filter(streamer => metaByStreamer[streamer]).map(this.createStreamerObj);
           this.setState(state => ({
             ...state,
-            global_time: parseInt(hash[0])*1000,
+            globalTime: parseInt(hash[0])*1000,
             streamers: targetStreamers,
             selectStreamerShown: false,
             changelogShown: false,
           }), () => {
+            GlobalTimeService.setGlobalTime(parseInt(hash[0])*1000);
             this.checkNoStreamerSelected();
           });
         }
@@ -175,7 +177,7 @@ class PlayerView extends React.Component {
   buildShareLink() {
     const state = this.state;
     const streamers = state.streamers.map(streamer=>streamer.name).join(':');
-    const dateOfEvent = Math.floor(state.global_time / 1000);
+    const dateOfEvent = Math.floor(state.globalTime / 1000);
     
     return `${this.baseUrl}#${dateOfEvent}&${streamers}`;
   }
@@ -205,8 +207,8 @@ class PlayerView extends React.Component {
     const streamers = state.streamers.filter(streamer => streamer.visible).map(streamer => {
       return {
         streamerName: streamer.name,
-        video_id: findMatchingVOD(streamer.name, state.global_time),
-        next_video_id: findNextVOD(streamer.name, state.global_time),
+        video_id: findMatchingVOD(streamer.name, state.globalTime),
+        next_video_id: findNextVOD(streamer.name, state.globalTime),
       }
     });
     
@@ -287,7 +289,7 @@ class PlayerView extends React.Component {
                   <div className="fullh">
                     <WatchPartyPanel
                       config={props.config}
-                      global_time={state.global_time}
+                      globalTime={state.globalTime}
                       visible={state.watchPartyPanelShown}
                       enabled={state.watchPartyEnabled}
                       ready={state.watchPartyRoomId !== null}
@@ -299,7 +301,7 @@ class PlayerView extends React.Component {
                       config={props.config}
                       metaByVid={props.metaByVid}
                       ref={this.multiplayersRef}
-                      global_time={state.global_time}
+                      globalTime={state.globalTime}
                       streamers={streamers}
                       onTimeUpdate={this.handleTimeChange}
                       onRemovePlayer={this.handleRemovePlayer}
@@ -311,7 +313,7 @@ class PlayerView extends React.Component {
             <FlexChild grow={0} height={20}>
               <div className="text-center">
                 <div className="player-view__global-time">
-                  {formatDateTimeSeconds(state.global_time)}
+                  {formatDateTimeSeconds(state.globalTime)}
                 </div>
               </div>
             </FlexChild>
@@ -323,7 +325,7 @@ class PlayerView extends React.Component {
                       config={props.config}
                       streamersObj={props.streamersObj}
                       metaByStreamer={props.metaByStreamer}
-                      time={state.global_time}
+                      time={state.globalTime}
                       streamers={state.streamers}
                       onTimeChange={this.handleTimeChange}
                       onRemoveStreamer={this.handleRemovePlayer}
@@ -366,12 +368,12 @@ class PlayerView extends React.Component {
   handleTimeChange(targetTime) {
     this.setState(state => ({
       ...state,
-      global_time: targetTime,
+      globalTime: targetTime,
     }));
     if (this.state.watchPartyEnabled) {
+      GlobalTimeService.setGlobalTime(targetTime);
       console.log('broadcast');
       WatchpartyService.broadcastTime(targetTime);
-      WatchpartyService.broadcastPeerName('Jean-Eude');
     }
   }
   

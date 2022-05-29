@@ -1,4 +1,6 @@
 import { RTCService } from './rtc-service';
+import { LocalStorageService } from './localstorage-service';
+import { GlobalTimeService } from './global-time-service';
 
 /*
 
@@ -22,7 +24,8 @@ export const WatchpartyService = {
   onPeerDisconnectCb: null,
   
   init() {
-    RTCService.onData(WatchpartyService.onData);
+    RTCService.onData(WatchpartyService.handleData);
+    RTCService.onNewConnection(WatchpartyService.handleNewConnection);
   },
   
   startWatchParty() {
@@ -37,7 +40,7 @@ export const WatchpartyService = {
     });
   },
   
-  onData(data) {
+  handleData(data) {
     console.log('[WATCHPARTY] data received', data);
     
     if (data.data.type === 'playingStatus') {
@@ -54,10 +57,17 @@ export const WatchpartyService = {
       if (data.type === 'currentTime') {
         this.setState(state => ({
           ...state,
-          global_time: data.data,
+          globalTime: data.data,
         }));
       }
     }*/
+  },
+  
+  handleNewConnection(connection) {
+    setTimeout(() => {
+      WatchpartyService.broadcastPeerName(LocalStorageService.getUsername());
+      WatchpartyService.broadcastTime(GlobalTimeService.getGlobalTime());
+    }, 500);
   },
   
   broadcastTime(timestamp) {

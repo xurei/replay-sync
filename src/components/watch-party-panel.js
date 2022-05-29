@@ -2,24 +2,27 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
+import localStorage from 'store/dist/store.legacy';
 //TODO random name generator
-//import { uniqueNamesGenerator, Config, adjectives, animals } from 'unique-names-generator';
 import WatchPartyPeerControls from './watch-party-peer-controls';
 import { WatchpartyService } from '../services/watchparty-service';
 import autobind from 'abind';
 import { setSubState } from '../state-util';
 import { InputCopyText } from './input-copy-text';
+import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
+import { LocalStorageService } from '../services/localstorage-service';
+
+let broadcastUsernameTimer = null;
 
 class WatchPartyPanel extends React.Component {
   static propTypes = {
     className: PropTypes.string,
     config: PropTypes.object.isRequired,
     visible: PropTypes.bool.isRequired,
-    global_time: PropTypes.number.isRequired,
+    globalTime: PropTypes.number.isRequired,
     ready: PropTypes.bool.isRequired,
-    //onCreateRoom: PropTypes.func.isRequired,
-    //onJoinRoom: PropTypes.func.isRequired,
     onEnabled: PropTypes.func.isRequired,
+    myUsername: PropTypes.string.isRequired,
   };
   
   state = {
@@ -32,6 +35,7 @@ class WatchPartyPanel extends React.Component {
   constructor(props) {
     super(props);
     autobind(this);
+    this.state.myUsername = LocalStorageService.getUsername();
   }
   
   componentDidMount() {
@@ -106,15 +110,30 @@ class WatchPartyPanel extends React.Component {
             <InputCopyText value={state.watchPartyRoomId || ''} copiedText="ID copié !"/>
           </div>
         )}
+        <div style={{height: 50}}>
+          <FlexLayout direction="row">
+            <FlexChild width={80} style={{lineHeight: '52px'}}>Mon nom :</FlexChild>
+            <FlexChild grow={1}>
+              <input className="watchparty-panel__my-username" type="text" value={state.myUsername} onChange={this.handleUsernameChange}/>
+            </FlexChild>
+          </FlexLayout>
+        </div>
         <ul className="peers-list">
           {Object.keys(state.peers).map(peerId => {
+            const isMe = peerId === state.myPeerId;
+            const peerData = !isMe ? state.peers[peerId] : {
+              ...state.peers[peerId],
+              peerName: state.myUsername,
+              timestamp: props.globalTime,
+            };
             return (
               <WatchPartyPeerControls
                 key={peerId}
                 className="peer-controls"
+                isMe={isMe}
                 config={props.config}
                 peerId={peerId}
-                peerData={state.peers[peerId]}
+                peerData={peerData}
               />
             );
           })}
@@ -130,10 +149,11 @@ class WatchPartyPanel extends React.Component {
       this.setState(state => {
         const peers = {};
         peers[roomId] = {
-          peerName: 'moi-même', // TODO change with actual me name
+          peerName: state.myUsername,
         };
         return {
           ...state,
+          myPeerId: roomId,
           watchPartyRoomId: roomId,
           watchPartyEnabled: true,
           peers: peers
@@ -152,7 +172,7 @@ class WatchPartyPanel extends React.Component {
         this.setState(state => {
           const peers = {};
           peers[myPeerId] = {
-            peerName: 'moi-même', // TODO change with actual me name
+            peerName: state.myUsername,
           };
           return {
             ...state,
@@ -163,32 +183,45 @@ class WatchPartyPanel extends React.Component {
           };
         }, () => {
           this.props.onEnabled(this.state.watchPartyEnabled);
-          setTimeout(() => {
-            WatchpartyService.broadcastPeerName('Jean-Émeline');
-          }, 500);
         });
       });
     }
+  }
+  
+  handleUsernameChange(e) {
+    const value = e.target.value;
+    LocalStorageService.setUsername(value);
+    this.setState(state => ({
+      ...state,
+      myUsername: value,
+    }), () => {
+      if (broadcastUsernameTimer) {
+        clearTimeout(broadcastUsernameTimer);
+      }
+      broadcastUsernameTimer = setTimeout(() => {
+        WatchpartyService.broadcastPeerName(value);
+        broadcastUsernameTimer = null;
+      }, 1000);
+    });
   }
   
   shouldComponentUpdate(nextProps, nextState) {
     return !deepEqual(this.props, nextProps) || !deepEqual(this.state, nextState);
   }
 }
+
 //language=SCSS
 WatchPartyPanel = Styled(WatchPartyPanel)`
 & {
   position: absolute;
   z-index: 9;
-  width: 360px;
-  background: rgba(0,0,0, 0.6);
+  width: 400px;
+  background: rgba(0,0,0, 0.7);
   padding: 30px 10px;
   text-align: center;
+
+  .watchparty-panel__my-username {
   
-  input[type="text"] {
-    width: 100%;
-    text-align: center;
-    cursor: pointer;
   }
   
   &.disabled-view button {
@@ -196,7 +229,7 @@ WatchPartyPanel = Styled(WatchPartyPanel)`
   }
   
   ul.peers-list {
-    padding: 0;
+    padding: 16px 0 0 0;
     margin: 0;
     
     > .peer-controls {
