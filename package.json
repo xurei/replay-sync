@@ -26,7 +26,6 @@
     "react-youtube": "^7.13.1",
     "store": "^2.0.12",
     "unique-names-generator": "^4.7.1",
-    "uuid": "^8.3.2",
     "xureact": "^1.3.4"
   },
   "devDependencies": {

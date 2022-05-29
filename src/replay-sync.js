@@ -2,7 +2,6 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import { StatsView } from './stats-view';
 import { PlayerView } from './player-view';
-import { v4 as uuid } from 'uuid';
 import { prepareMetadata } from './metadata-util';
 import { migrateConfig } from './config-util';
 
