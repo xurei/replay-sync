@@ -3,8 +3,6 @@ import PropTypes from 'prop-types';
 import deepEqual from 'deep-eql'; //eslint-disable-line no-unused-vars
 import { tsToVodTime } from '../time-util.js';
 
-const global = window;
-
 class TwitchPlayer extends React.Component {
   static propTypes = {
     video_id: PropTypes.string.isRequired,
@@ -49,9 +47,9 @@ class TwitchPlayer extends React.Component {
   
   componentDidMount() {
     const props = this.props;
-    this.player = new global.Twitch.Embed(this.embedId, this.options);
-    this.player.addEventListener(global.Twitch.Player.VIDEO_READY, this.handleEventReady);
-    this.player.addEventListener(global.Twitch.Player.ENDED, this.handleEventEnded);
+    this.player = new Twitch.Embed(this.embedId, this.options);
+    this.player.addEventListener(Twitch.Player.VIDEO_READY, this.handleEventReady);
+    this.player.addEventListener(Twitch.Player.ENDED, this.handleEventEnded);
     this.player.addEventListener('UPDATE_STATE', this.handleEventUpdateState);
   }
   
@@ -162,8 +160,8 @@ class TwitchPlayer extends React.Component {
   }
   
   componentWillUnmount() {
-    this.player.removeEventListener(global.Twitch.Player.VIDEO_READY, this.handleEventReady);
-    this.player.removeEventListener(global.Twitch.Player.ENDED, this.handleEventEnded);
+    this.player.removeEventListener(Twitch.Player.VIDEO_READY, this.handleEventReady);
+    this.player.removeEventListener(Twitch.Player.ENDED, this.handleEventEnded);
     this.player.removeEventListener('UPDATE_STATE', this.handleEventUpdateState);
   }
   
