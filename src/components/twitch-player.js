@@ -16,8 +16,6 @@ class TwitchPlayer extends React.Component {
   
   player = null;
   embedId = null;
-  hasToggledStatus = false;
-  
   prevPlayerState = null;
   
   state = {
@@ -81,8 +79,6 @@ class TwitchPlayer extends React.Component {
   }
   
   render() {
-    const props = this.props;
-    const state = this.state;
     return (
       <div id={this.embedId} style={{height: '100%'}}/>
     );
