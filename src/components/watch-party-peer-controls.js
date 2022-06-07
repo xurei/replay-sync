@@ -7,14 +7,19 @@ import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex
 import { IconSyncPeople } from './icon-sync-people';
 import { IconFastForward } from './icon-fast-forward';
 import { IconSkipForward } from './icon-skip-forward';
+import { GlobalTimeService } from '../services/global-time-service';
+import { tsToVodTimeShort } from '../time-util';
 
 class WatchPartyPeerControls extends React.Component {
   static propTypes = {
     className: PropTypes.string,
     config: PropTypes.object.isRequired,
+    globalTime: PropTypes.number.isRequired,
     isMe: PropTypes.bool.isRequired,
+    isSynchronizing: PropTypes.bool.isRequired,
     peerId: PropTypes.string.isRequired,
     peerData: PropTypes.object.isRequired,
+    onToggleSync: PropTypes.func.isRequired,
   };
   
   constructor(props) {
@@ -23,12 +28,23 @@ class WatchPartyPeerControls extends React.Component {
   }
   
   formatTimestamp(timestamp) {
+    const props = this.props;
     timestamp = parseInt(timestamp);
     if (isNaN(timestamp)) {
       return '';
     }
     else {
-      return timestamp;
+      const globalTime = props.globalTime;
+      const delta = timestamp-globalTime;
+      if (delta < -1000) {
+        return `-${tsToVodTimeShort(-delta)}`;
+      }
+      else if (delta < 1000) {
+        return 'SYNC';
+      }
+      else {
+        return `+${tsToVodTimeShort(delta)}`;
+      }
     }
   }
   
@@ -41,23 +57,23 @@ class WatchPartyPeerControls extends React.Component {
             👤 {props.peerData.peerName || 'guest'}
           </FlexChild>
           <FlexChild width={110} className="peer-time">
-            <span className="time-info">{this.formatTimestamp(props.peerData.timestamp)}</span>
+            <span className="time-info">{props.isMe ? '-' : this.formatTimestamp(props.peerData.timestamp)}</span>
           </FlexChild>
           <FlexChild width={85}>
             {!props.isMe && (
               <div className="peer-controls">
-                <button className="" disabled>
+                <button className={`toggle-button ${props.isSynchronizing ? '' : 'toggle-button__off'}`} onClick={this.handleToggleSync}>
                   <IconSyncPeople size={16} color="#fff"/>
                   <div className="watchparty-peer-controls__button-text">Synchroniser</div>
                 </button>
-                <button className="">
-                  <IconFastForward size={14} color="#fff"/>
-                  <div className="watchparty-peer-controls__button-text">Rattraper</div>
-                </button>
-                <button className="">
-                  <IconSkipForward size={14} color="#fff"/>
-                  <div className="watchparty-peer-controls__button-text">Aller au même temps</div>
-                </button>
+                {/*<button className="">*/}
+                {/*  <IconFastForward size={14} color="#fff"/>*/}
+                {/*  <div className="watchparty-peer-controls__button-text">Rattraper</div>*/}
+                {/*</button>*/}
+                {/*<button className="">*/}
+                {/*  <IconSkipForward size={14} color="#fff"/>*/}
+                {/*  <div className="watchparty-peer-controls__button-text">Aller au même temps</div>*/}
+                {/*</button>*/}
               </div>
             )}
           </FlexChild>
@@ -66,6 +82,11 @@ class WatchPartyPeerControls extends React.Component {
         
       </li>
     );
+  }
+  
+  handleToggleSync() {
+    const props = this.props;
+    props.onToggleSync(props.peerId, !props.isSynchronizing);
   }
   
   shouldComponentUpdate(nextProps) {
@@ -121,6 +142,17 @@ WatchPartyPeerControls = Styled(WatchPartyPeerControls)`
         display: block;
         &:hover {
           display: none;
+        }
+      }
+      
+      &.toggle-button {
+        border-width: 2px;
+        border-color: ${props => props.config.colorPalette.button.border};
+        &.toggle-button__off {
+          background: ${props => props.config.colorPalette.button.disabledBackground};
+        }
+        &.toggle-button__on {
+          //border-width: 3px;
         }
       }
     }

@@ -2,7 +2,6 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
-//TODO random name generator
 import WatchPartyPeerControls from './watch-party-peer-controls';
 import { WatchpartyService } from '../services/watchparty-service';
 import autobind from 'abind';
@@ -13,7 +12,7 @@ import { LocalStorageService } from '../services/localstorage-service';
 
 let broadcastUsernameTimer = null;
 
-class WatchPartyPanel extends React.Component {
+class WatchpartyPanel extends React.Component {
   static propTypes = {
     className: PropTypes.string,
     config: PropTypes.object.isRequired,
@@ -21,13 +20,14 @@ class WatchPartyPanel extends React.Component {
     globalTime: PropTypes.number.isRequired,
     ready: PropTypes.bool.isRequired,
     onEnabled: PropTypes.func.isRequired,
-    myUsername: PropTypes.string.isRequired,
+    onSyncRequested: PropTypes.func.isRequired,
   };
   
   state = {
     watchPartyRoomId: null,
     watchPartyEnabled: false,
     myPeerId: null,
+    synchronizingWith: null,
     peers: {},
   };
   
@@ -40,9 +40,15 @@ class WatchPartyPanel extends React.Component {
   componentDidMount() {
     WatchpartyService.init();
     WatchpartyService.onReceivePlayingStatus((peerId, playingStatus) => {
+      const state = this.state;
+      const props = this.props;
+      if (peerId === state.synchronizingWith) {
+        props.onSyncRequested(playingStatus.timestamp);
+      }
       // TODO change the time iff the peerId is marked as synchronized
       this.setState(setSubState('peers', peerId, peerState => {
         //TODO sanitize playingStatus
+        
         return {
           ...peerState,
           ...playingStatus,
@@ -141,11 +147,13 @@ class WatchPartyPanel extends React.Component {
               <WatchPartyPeerControls
                 key={peerId}
                 className="peer-controls"
+                globalTime={props.globalTime}
                 isMe={isMe}
                 config={props.config}
                 peerId={peerId}
+                isSynchronizing={peerId === state.synchronizingWith}
                 peerData={peerData}
-              />
+                onToggleSync={this.handleToggleSync}/>
             );
           })}
         </ul>
@@ -216,13 +224,28 @@ class WatchPartyPanel extends React.Component {
     });
   }
   
+  handleToggleSync(peerId, active) {
+    if (active) {
+      this.setState(state => ({
+        ...state,
+        synchronizingWith: peerId,
+      }));
+    }
+    else {
+      this.setState(state => ({
+        ...state,
+        synchronizingWith: null,
+      }));
+    }
+  }
+  
   shouldComponentUpdate(nextProps, nextState) {
     return !deepEqual(this.props, nextProps) || !deepEqual(this.state, nextState);
   }
 }
 
 //language=SCSS
-WatchPartyPanel = Styled(WatchPartyPanel)`
+WatchpartyPanel = Styled(WatchpartyPanel)`
 & {
   position: absolute;
   z-index: 9;
@@ -253,4 +276,4 @@ WatchPartyPanel = Styled(WatchPartyPanel)`
   }
 }
 `;
-export { WatchPartyPanel };
+export { WatchpartyPanel };

@@ -18,7 +18,7 @@ import autobind from 'abind';
 
 import { style } from './App.css.js';
 import { IconPeople } from './components/icon-people';
-import { WatchPartyPanel } from './components/watch-party-panel';
+import { WatchpartyPanel } from './components/watch-party-panel';
 import { WatchpartyService } from './services/watchparty-service';
 import { GlobalTimeService } from './services/global-time-service';
 
@@ -76,7 +76,7 @@ class PlayerView extends React.Component {
     donateShown: false,
     shareLink: '',
     selectStreamerShown: false,
-    watchPartyPanelShown: false,
+    watchpartyPanelShown: false,
     watchPartyEnabled: true,
     streamers: [
       //"bagherajones",
@@ -156,6 +156,7 @@ class PlayerView extends React.Component {
       else {
         try {
           const targetStreamers = hash[1].split(':').filter(streamer => metaByStreamer[streamer]).map(this.createStreamerObj);
+          GlobalTimeService.setGlobalTime(parseInt(hash[0])*1000);
           this.setState(state => ({
             ...state,
             globalTime: parseInt(hash[0])*1000,
@@ -163,7 +164,6 @@ class PlayerView extends React.Component {
             selectStreamerShown: false,
             changelogShown: false,
           }), () => {
-            GlobalTimeService.setGlobalTime(parseInt(hash[0])*1000);
             this.checkNoStreamerSelected();
           });
         }
@@ -275,8 +275,8 @@ class PlayerView extends React.Component {
                         <IconDonate size={22} color="inherit"/>
                         <div className="player-view__controls__button-text">Soutenir le projet</div>
                       </button>
-                      <button onClick={this.handleToggleWatchPartyPanel} style={{fontSize: 16, lineHeight: '22px', paddingTop: 7}}>
-                        <IconPeople size={22} color={state.watchPartyPanelShown ? props.config.colorPalette.common.primary : 'inherit'}/>
+                      <button onClick={this.handleToggleWatchpartyPanel} style={{fontSize: 16, lineHeight: '22px', paddingTop: 7}}>
+                        <IconPeople size={22} color={state.watchpartyPanelShown ? props.config.colorPalette.common.primary : 'inherit'}/>
                         <div className="player-view__controls__button-text">Regarder ensemble</div>
                       </button>
                       {/*<button onClick={this.handleThanksClick} style={{fontSize: 20}}>*/}
@@ -287,15 +287,16 @@ class PlayerView extends React.Component {
                 </FlexChild>
                 <FlexChild grow={1} width={1}>
                   <div className="fullh">
-                    <WatchPartyPanel
+                    <WatchpartyPanel
                       config={props.config}
                       globalTime={state.globalTime}
-                      visible={state.watchPartyPanelShown}
+                      visible={state.watchpartyPanelShown}
                       enabled={state.watchPartyEnabled}
                       ready={state.watchPartyRoomId !== null}
                       link={this.buildWatchPartyLink()}
                       roomId={state.watchPartyRoomId}
                       onEnabled={this.handleWatchPartyEnabled}
+                      onSyncRequested={this.handleTimeChangeNoBroadcast}
                     />
                     <MultiPlayers
                       config={props.config}
@@ -366,15 +367,19 @@ class PlayerView extends React.Component {
   }
   
   handleTimeChange(targetTime) {
-    this.setState(state => ({
-      ...state,
-      globalTime: targetTime,
-    }));
+    this.handleTimeChangeNoBroadcast(targetTime);
     if (this.state.watchPartyEnabled) {
       GlobalTimeService.setGlobalTime(targetTime);
       console.log('broadcast');
       WatchpartyService.broadcastTime(targetTime);
     }
+  }
+  
+  handleTimeChangeNoBroadcast(targetTime) {
+    this.setState(state => ({
+      ...state,
+      globalTime: targetTime,
+    }));
   }
   
   handleToggleStreamerVisibility(streamerToToggle) {
@@ -426,10 +431,10 @@ class PlayerView extends React.Component {
     }));
   }
   
-  handleToggleWatchPartyPanel() {
+  handleToggleWatchpartyPanel() {
     this.setState(state => ({
       ...state,
-      watchPartyPanelShown: !state.watchPartyPanelShown,
+      watchpartyPanelShown: !state.watchpartyPanelShown,
     }));
   }
 }

@@ -10,6 +10,26 @@ export function tsToVodTime(ts) {
   return `${h}h${m}m${s}s`;
 }
 
+export function tsToVodTimeShort(ts) {
+  ts = Math.floor(ts/1000);
+  const s = ts % 60;
+  ts -= s;
+  ts /= 60;
+  const m = ts % 60;
+  ts -= m;
+  ts /= 60;
+  const h = ts;
+  if (h > 0) {
+    return `${h}h${m}m${s}s`;
+  }
+  else if (m > 0) {
+    return `${m}m${s}s`;
+  }
+  else {
+    return `${s}s`;
+  }
+}
+
 export function tsToTime(ts) {
   ts = Math.floor(ts/1000);
   const s = ts % 60;
