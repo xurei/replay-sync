@@ -1,3 +1,6 @@
+## Version 0.6.2 - Bravo pour les 10 Millions
+- **Évènements** Feature développée pour le ZEvent 2022, la liste des évènements est disponible dans la side bar.
+
 ## Version 0.5.0 - Timelines avec ellipse
 - **Les retrouvailles** Il est possible de créer plusieurs time frames séparées par une ellipse (Félicitations Miguel et Kim !)
 
