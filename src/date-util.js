@@ -19,6 +19,7 @@ export function dateDiff(early, late) {
 }
 
 export function atMidnigth(/*Date*/d) {
+  d = asDate(d);
   return new Date(d.getFullYear(), d.getMonth(), d.getDate());
 }
 

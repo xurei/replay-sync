@@ -11,26 +11,30 @@ import { OverlayThanks } from './components/overlay-thanks';
 import { OverlayChangelog } from './components/overlay-changelog';
 import { IconShare } from './components/icon-share';
 import { OverlayShare } from './components/overlay-share';
+import { IconCalendar } from './components/icon-calendar';
 import { IconDonate } from './components/icon-donate';
 import { IconGift } from './components/icon-gift';
 import { OverlayDonate } from './components/overlay-donate';
 import { formatDateTimeSeconds, formatFullTime, getDayOfYear } from './date-util';
 import { hasNewVersion, setLastVersionVisited } from './version';
+import { EventsPanel } from './components/events-panel';
 
 import { style } from './App.css.js';
 
 let metaByStreamer = null;
 
 function findMatchingVOD(streamerName, global_time) {
-  const meta = Object.values(metaByStreamer[streamerName]);
-  for (const vod of meta) {
-    const createdTs = vod.createdTs;
-    if (createdTs <= global_time && global_time <= createdTs + vod.duration_ms - 3000) {
-      let vid = vod.id;
-      if (vod.permanent_id) {
-        vid = `${vod.permanent_id.id}<${vid}`;
+  if (metaByStreamer[streamerName]) {
+    const meta = Object.values(metaByStreamer[streamerName]);
+    for (const vod of meta) {
+      const createdTs = vod.createdTs;
+      if (createdTs <= global_time && global_time <= createdTs + vod.duration_ms - 3000) {
+        let vid = vod.id;
+        if (vod.permanent_id) {
+          vid = `${vod.permanent_id.id}<${vid}`;
+        }
+        return vid;
       }
-      return vid;
     }
   }
   return null;
@@ -58,6 +62,7 @@ class PlayerView extends React.Component {
     config: PropTypes.object.isRequired,
     metaByStreamer: PropTypes.object.isRequired,
     metaByVid: PropTypes.object.isRequired,
+    events: PropTypes.array.isRequired,
   };
   
   multiplayersRef = React.createRef();
@@ -71,6 +76,7 @@ class PlayerView extends React.Component {
     donateShown: false,
     shareLink: '',
     selectStreamerShown: false,
+    eventsPanelShown: false,
     streamers: [
       //"bagherajones",
       //"horty_",
@@ -100,6 +106,8 @@ class PlayerView extends React.Component {
     this.handleChangelogClick = this.handleChangelogClick.bind(this);
     this.handleThanksClick = this.handleThanksClick.bind(this);
     this.handleToggleStreamerVisibility = this.handleToggleStreamerVisibility.bind(this);
+    this.handleShowEventsPanel = this.handleShowEventsPanel.bind(this);
+    this.handleSelectEvent = this.handleSelectEvent.bind(this);
   }
   
   componentDidMount() {
@@ -260,6 +268,12 @@ class PlayerView extends React.Component {
                         <IconDonate size={22} color="inherit"/>
                         <div className="player-view__controls__button-text">Soutenir le projet</div>
                       </button>
+                      {props.config.hasEvents && (
+                        <button onClick={this.handleShowEventsPanel} style={{fontSize: 16, lineHeight: '22px', paddingTop: 7}}>
+                          <IconCalendar size={22} color={state.eventsPanelShown ? props.config.colorPalette.common.primary : 'inherit'}/>
+                          <div className="player-view__controls__button-text">Évènements</div>
+                        </button>
+                      )}
                       {/*<button onClick={this.handleThanksClick} style={{fontSize: 20}}>*/}
                       {/*  ♥*/}
                       {/*</button>*/}
@@ -268,6 +282,9 @@ class PlayerView extends React.Component {
                 </FlexChild>
                 <FlexChild grow={1} width={1}>
                   <div className="fullh">
+                    {props.config.hasEvents && state.eventsPanelShown && (
+                      <EventsPanel config={props.config} events={props.events} onSelectEvent={this.handleSelectEvent}/>
+                    )}
                     <MultiPlayers
                       config={props.config}
                       metaByVid={props.metaByVid}
@@ -338,6 +355,26 @@ class PlayerView extends React.Component {
     this.setState(state => ({
       ...state,
       global_time: targetTime,
+    }));
+  }
+  
+  handleShowEventsPanel() {
+    this.setState(state => ({
+      ...state,
+      eventsPanelShown: !state.eventsPanelShown,
+    }));
+  }
+  
+  handleSelectEvent(eventData) {
+    const channels = eventData.channels.slice(0, Math.min(eventData.channels.length, 5));
+    console.log(channels);
+    this.setState(state => ({
+      ...state,
+      eventsPanelShown: false,
+      global_time: eventData.timestamp*1000,
+      streamers: channels.map(chan => ({
+        name: chan.id, visible: true,
+      })),
     }));
   }
   
