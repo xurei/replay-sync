@@ -127,7 +127,6 @@ class PlayerView extends React.Component {
   
   componentDidUpdate(prevProps, prevState, snapshot) {
     const state = this.state;
-    this.checkNoStreamerSelected();
     let date = new Date(state.global_time);
     const strDate = `J${getDayOfYear(date)-this.initialDayOfYear+1}T${formatFullTime(date)}`;
     //strDate.substring(0, strDate.length-5)+'Z';
@@ -145,10 +144,7 @@ class PlayerView extends React.Component {
     const hash = document.location.hash.substr(1).split('&');
   
     // J115T01:13:11 => 2021-04-23T12:34:56+02:00
-    if (hash.length < 2) {
-      this.checkNoStreamerSelected();
-    }
-    else {
+    if (hash.length >= 2) {
       try {
         const targetStreamers = hash[1].split(':').filter(streamer => metaByStreamer[streamer]).map(this.createStreamerObj);
         this.setState(state => ({
@@ -159,7 +155,6 @@ class PlayerView extends React.Component {
           changelogShown: false,
         }), () => {
           //this.multiplayersRef.current.gotoTime(targetTs);
-          this.checkNoStreamerSelected();
         });
       }
       catch (e) {
@@ -178,15 +173,6 @@ class PlayerView extends React.Component {
     const dateOfEvent = Math.floor(state.global_time / 1000);
     
     return `${baseUrl}#${dateOfEvent}&${streamers}`;
-  }
-  
-  checkNoStreamerSelected() {
-    if (this.state.streamers.length === 0 && !this.state.selectStreamerShown) {
-      this.setState(state => ({
-        ...state,
-        selectStreamerShown: true,
-      }));
-    }
   }
   
   render() {
@@ -285,20 +271,32 @@ class PlayerView extends React.Component {
                     {props.config.hasEvents && state.eventsPanelShown && (
                       <EventsPanel config={props.config} events={props.events} onSelectEvent={this.handleSelectEvent}/>
                     )}
-                    <MultiPlayers
-                      config={props.config}
-                      metaByVid={props.metaByVid}
-                      ref={this.multiplayersRef}
-                      global_time={this.state.global_time}
-                      streamers={streamers}
-                      onTimeUpdate={time => this.setState(state => {
-                        return ({
-                          ...state,
-                          global_time: time,
-                        });
-                      })}
-                      onRemovePlayer={this.handleRemovePlayer}
-                    />
+                    {state.streamers.length === 0 ? (
+                      <div className="empty-view fullw fullh">
+                        <div className="empty-view__select-event">
+                          ⬅ Clique ici pour choisir un évènement
+                        </div>
+                        <div className="empty-view__add-streamer">
+                          Clique ici pour ajouter un streamer<br/>
+                          <span style={{display: 'inline-block', width: 65}}> </span>⬇
+                        </div>
+                      </div>
+                    ) : (
+                      <MultiPlayers
+                        config={props.config}
+                        metaByVid={props.metaByVid}
+                        ref={this.multiplayersRef}
+                        global_time={state.global_time}
+                        streamers={streamers}
+                        onTimeUpdate={time => this.setState(state => {
+                          return ({
+                            ...state,
+                            global_time: time,
+                          });
+                        })}
+                        onRemovePlayer={this.handleRemovePlayer}
+                      />
+                    )}
                   </div>
                 </FlexChild>
               </FlexLayout>
@@ -574,6 +572,23 @@ PlayerView = Styled(PlayerView)`
       animation-iteration-count: infinite;
       animation-timing-function: linear;
     }
+  }
+
+  .empty-view {
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-image: ${props => `url(${props.config.offlineBackgroundImage})` || 'none'};
+  }
+  
+  .empty-view__select-event {
+    position: absolute;
+    top: 190px;
+  }
+  
+  .empty-view__add-streamer {
+    position: absolute;
+    bottom: 0;
   }
 }
 
