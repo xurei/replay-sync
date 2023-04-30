@@ -273,9 +273,11 @@ class PlayerView extends React.Component {
                     )}
                     {state.streamers.length === 0 ? (
                       <div className="empty-view fullw fullh">
-                        <div className="empty-view__select-event">
-                          ⬅ Clique ici pour choisir un évènement
-                        </div>
+                        {props.config.hasEvents && (
+                          <div className="empty-view__select-event">
+                            ⬅ Clique ici pour choisir un évènement
+                          </div>
+                        )}
                         <div className="empty-view__add-streamer">
                           Clique ici pour ajouter un streamer<br/>
                           <span style={{display: 'inline-block', width: 65}}> </span>⬇
