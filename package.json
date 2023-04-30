@@ -9,9 +9,9 @@
   "private": true,
   "sideEffects": false,
   "scripts": {
-    "watch": "BABEL_ENV=module node_modules/.bin/babel src --watch -d lib/module",
-    "build": "rimraf lib/* && npm run build:module",
-    "build:module": "BABEL_ENV=module node_modules/.bin/babel src -d lib/module"
+    "watch": "cross-env BABEL_ENV=module NODE_OPTIONS=--openssl-legacy-provider node_modules/.bin/babel src --watch -d lib/module",
+    "build": "rimraf lib/* && cross-env NODE_OPTIONS=--openssl-legacy-provider npm run build:module",
+    "build:module": "cross-env BABEL_ENV=module node_modules/.bin/babel src -d lib/module"
   },
   "dependencies": {
     "date-fns": "^2.21.2",
@@ -38,7 +38,8 @@
     "babel-plugin-inline-import": "^3.0.0",
     "babel-plugin-inline-json-import": "^0.3.2",
     "babel-plugin-styled-components": "^1.13.2",
-    "chokidar": "^3.5.2"
+    "chokidar": "^3.5.2",
+    "cross-env": "^7.0.3"
   },
   "peerDependencies": {
     "react": ">17.0.0",

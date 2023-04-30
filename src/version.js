@@ -2,7 +2,7 @@ import localStorage from 'store/dist/store.legacy';
 
 import _package from '../package.json';
 const version = _package.version;
-_package = null; //Free useless memory as we only need the version field
+//_package = null; //Free useless memory as we only need the version field
 let lastVersionVisited = localStorage.get('lastVersionVisited');
 
 function hasNewVersion() {
