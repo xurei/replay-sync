@@ -3,12 +3,11 @@ import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
 
 import { OverlayWrapper } from './overlay-wrapper';
-//import changelog from '../CHANGELOG.md?raw';
-const changelog = "ta mere";
+import changelog from '../CHANGELOG.md?raw';
 import ReactMarkdown from 'react-markdown';
 import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
 import { IconDiscord } from './icon-discord';
-import { IconTwitter } from './icon-twitter';
+import { IconBluesky } from './icon-bluesky';
 import { IconTwitch } from './icon-twitch';
 
 class OverlayChangelog extends React.Component {
@@ -55,8 +54,8 @@ class OverlayChangelog extends React.Component {
                   <IconDiscord size={24} color={props.config.colorPalette.common.primary}/>
                 </a>
                 <span className="d-inline-block" style={{width: 15}}/>
-                <a href="https://www.twitter.com/xurei" target="_blank" rel="noreferrer">
-                  <IconTwitter size={24} color={props.config.colorPalette.common.primary}/>
+                <a href="https://bsky.app/profile/xureilab.com" target="_blank" rel="noreferrer">
+                  <IconBluesky size={24} color={props.config.colorPalette.common.primary}/>
                 </a>
                 <span className="d-inline-block" style={{width: 15}}/>
                 <a href="https://www.twitch.tv/xurei" target="_blank" rel="noreferrer">
