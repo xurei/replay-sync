@@ -60,7 +60,7 @@ class PlayerView extends React.Component {
     config: PropTypes.object.isRequired,
     metaByStreamer: PropTypes.object.isRequired,
     metaByVid: PropTypes.object.isRequired,
-    events: PropTypes.array.isRequired,
+    events: PropTypes.array,
   };
   
   multiplayersRef = React.createRef();
@@ -210,14 +210,14 @@ class PlayerView extends React.Component {
               metaByStreamer={metaByStreamer}
               meta
               selectedStreamers={state.streamers.map(streamer=>streamer.name)}
-              onSelect={(streamerLogin) => {
+              onSelect={(streamerLogin, isMultiSelect) => {
                 this.setState(state => {
                   const newStreamers = state.streamers.slice();
                   newStreamers.push(this.createStreamerObj(streamerLogin));
                   return {
                     ...state,
                     streamers: newStreamers,
-                    selectStreamerShown: false,
+                    selectStreamerShown: isMultiSelect && newStreamers.length < 9,
                   };
                 });
               }}
@@ -271,7 +271,7 @@ class PlayerView extends React.Component {
                 <FlexChild grow={1} width={1}>
                   <div className="fullh">
                     {props.config.hasEvents && state.eventsPanelShown && (
-                      <EventsPanel config={props.config} events={props.events} onSelectEvent={this.handleSelectEvent}/>
+                      <EventsPanel config={props.config} events={props.events || []} onSelectEvent={this.handleSelectEvent}/>
                     )}
                     {state.streamers.length === 0 ? (
                       <div className="empty-view fullw fullh">
@@ -282,7 +282,8 @@ class PlayerView extends React.Component {
                         )}
                         <div className="empty-view__add-streamer">
                           Clique ici pour ajouter un streamer<br/>
-                          <span style={{display: 'inline-block', width: 65}}> </span>⬇
+                          <span style={{display: 'inline-block', width: 65}}> </span>
+                          <span className="empty-view__add-streamer__arrow">⬇</span>
                         </div>
                       </div>
                     ) : (
@@ -599,6 +600,19 @@ PlayerView = Styled(PlayerView)`
   .empty-view__add-streamer {
     position: absolute;
     bottom: 0;
+    font-size: 3vh;
+  }
+  
+  @keyframes arrow-bounce {
+    0%   { transform: translateY(0vh); }
+    20%  { transform: translateY(1vh); }
+    40% { transform: translateY(0vh); }
+    100% { transform: translateY(0vh); }
+  }
+  .empty-view__add-streamer__arrow {
+    position: relative;
+    display: inline-block;
+    animation: arrow-bounce 3s infinite;
   }
 }
 

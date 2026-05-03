@@ -80,15 +80,6 @@ class OverlaySelectStreamer extends React.Component {
             <FlexChild height={1} grow={1}>
               <div className="fullh scroll-y select-streamer__scrollview">
                 {this.getFilteredStreamers()
-                .filter(login => {
-                  const streamerName = streamersObj[login];
-                  const rpNameLowercase = streamerName.rp_name.toLowerCase();
-                  const searchValueLowercase = state.searchValue.toLowerCase();
-                  return (
-                       login.indexOf(searchValueLowercase) !== -1
-                    || rpNameLowercase.indexOf(searchValueLowercase) !== -1
-                  );
-                })
                 .map(login => (
                   <div key={login} className="select-streamer__streamer" onClick={() => {
                     this.props.onSelect(login);
