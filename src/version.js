@@ -1,7 +1,6 @@
 import localStorage from 'store/dist/store.legacy';
 
-import _package from '../package.json';
-const version = _package.version;
+const version = import.meta.env.APP_VERSION;
 //_package = null; //Free useless memory as we only need the version field
 let lastVersionVisited = localStorage.get('lastVersionVisited');
 

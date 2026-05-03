@@ -112,7 +112,7 @@ class PlayerView extends React.Component {
   
   componentDidMount() {
     this.parseShareLink();
-    global.addEventListener('keydown', e => {
+    globalThis.addEventListener('keydown', e => {
       if(e.which === 27) {
         this.setState(state => ({
           ...state,
