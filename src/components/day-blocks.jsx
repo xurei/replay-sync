@@ -2,21 +2,9 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
 import { buildDaysArray } from '../timeline-util';
-import deepEqual from 'deep-eql';
 
-class DayBlocks extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    showLabel: PropTypes.bool,
-    width: PropTypes.number,
-    height: PropTypes.number,
-    className: PropTypes.string,
-  };
-  
-  render() {
-    const props = this.props;
-    
-    const daysArray = buildDaysArray(props.config.timeFrames, props.config.timelineType);
+function DayBlocks(props) {
+  const daysArray = buildDaysArray(props.config.timeFrames, props.config.timelineType);
   
     const totalLength = daysArray.reduce((acc, dayObj) => {
       if (dayObj.type === 'ellipsis') {
@@ -51,12 +39,15 @@ class DayBlocks extends React.Component {
         })}
       </StyledWrapper>
     );
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
-  }
 }
+
+DayBlocks.propTypes = {
+  config: PropTypes.object.isRequired,
+  showLabel: PropTypes.bool,
+  width: PropTypes.number,
+  height: PropTypes.number,
+  className: PropTypes.string,
+};
 
 //language=SCSS
 const StyledWrapper = Styled.div`

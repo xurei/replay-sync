@@ -1,18 +1,10 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
-import deepEqual from 'deep-eql';
 
-class IconShare extends React.Component {
-  static propTypes = {
-    color: PropTypes.string,
-    size: PropTypes.number,
-  };
-  
-  render() {
-    const props = this.props;
-    const color = props.color || '#000';
-    const size = props.size || 32;
-    return (
+function IconShare(props) {
+  const color = props.color || '#000';
+  const size = props.size || 32;
+  return (
       <span className={`d-inline-block ${props.className || ''}`}>
           <svg viewBox="-21 0 512 512" width="512pt" xmlns="http://www.w3.org/2000/svg" style={{fill: color, width: size}}>
             <path
@@ -33,12 +25,12 @@ class IconShare extends React.Component {
                 d="m333.632812 421.761719c-3.585937 0-7.210937-.898438-10.539062-2.796875l-197.953125-112.851563c-10.21875-5.824219-13.800781-18.859375-7.976563-29.101562 5.800782-10.238281 18.855469-13.84375 29.097657-7.976563l197.953125 112.851563c10.21875 5.824219 13.800781 18.859375 7.976562 29.101562-3.945312 6.910157-11.15625 10.773438-18.558594 10.773438zm0 0"/>
         </svg>
       </span>
-    );
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
-  }
+  );
 }
+
+IconShare.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.number,
+};
 
 export { IconShare };

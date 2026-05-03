@@ -1,18 +1,10 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
-import deepEqual from 'deep-eql';
 
-class IconGithub extends React.Component {
-  static propTypes = {
-    color: PropTypes.string,
-    size: PropTypes.number,
-  };
-  
-  render() {
-    const props = this.props;
-    const color = props.color || '#000';
-    const size = props.size || 32;
-    return (
+function IconGithub(props) {
+  const color = props.color || '#000';
+  const size = props.size || 32;
+  return (
       <span className={`d-inline-block ${props.className || ''}`}>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 438.549 438.549" style={{fill: color, width: size}}>
           <path d="M409.132,114.573c-19.608-33.596-46.205-60.194-79.798-79.8C295.736,15.166,259.057,5.365,219.271,5.365
@@ -37,12 +29,12 @@ class IconGithub extends React.Component {
             C438.536,184.851,428.728,148.168,409.132,114.573z"/>
         </svg>
       </span>
-    );
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
-  }
+  );
 }
+
+IconGithub.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.number,
+};
 
 export { IconGithub };

@@ -1,18 +1,10 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
-import deepEqual from 'deep-eql';
 
-class IconVolumeOn extends React.Component {
-  static propTypes = {
-    color: PropTypes.string,
-    size: PropTypes.number,
-  };
-  
-  render() {
-    const props = this.props;
-    const color = props.color || '#000';
-    const size = props.size || 32;
-    return (
+function IconVolumeOn(props) {
+  const color = props.color || '#000';
+  const size = props.size || 32;
+  return (
       <span className={`d-inline-block ${props.className || ''}`}>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 480" style={{fill: color, width: size}}>
           <path d="M278.944,17.577c-5.568-2.656-12.128-1.952-16.928,1.92L106.368,144.009H32c-17.632,0-32,14.368-32,32v128
@@ -28,12 +20,12 @@ class IconVolumeOn extends React.Component {
             S456.64,123.881,414.144,81.769z"/>
         </svg>
       </span>
-    );
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
-  }
+  );
 }
+
+IconVolumeOn.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.number,
+};
 
 export { IconVolumeOn };

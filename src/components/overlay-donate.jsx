@@ -5,29 +5,29 @@ import Styled from 'styled-components';
 import { OverlayWrapper } from './overlay-wrapper';
 import { FlexLayout, FlexChild } from './flex-layout';
 import { IconGithub } from './icon-github';
-import { IconUtip } from './icon-utip';
+import { IconKofi } from './icon-kofi';
 
-class OverlayDonate extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    onClose: PropTypes.func.isRequired,
-  };
-  
-  render() {
-    const props = this.props;
-    return (
+let OverlayDonate = function OverlayDonate(props) {
+  return (
       <OverlayWrapper width={'700px'} onClose={props.onClose}>
         <div className={props.className}>
           <FlexLayout direction="column" className="fullh">
             <FlexChild>
-              <h1 style={{marginBottom: 0}}><img src={props.config.logo.size192} alt={props.config.appName} width={96} height={96}/></h1>
+              <h1 style={{marginBottom: 0}}><img src={props.config.logo.size192} alt={props.config.appName} width={192} height={192}/></h1>
               <div style={{paddingBottom: 10}}>
                 <h2 style={{marginBottom: 0}}>Vous aimez notre travail ?</h2>
                 Vous pouvez faire une donation ici : <br/>
                 <br/>
+                {/*<div className="d-inline-block" style={{width: '20%'}}>*/}
+                {/*  <a href="https://utip.io/xurei" target="_blank" rel="noreferrer">*/}
+                {/*    <IconUtip color={props.config.colorPalette.common.primary} size={50}/>*/}
+                {/*    <br/>*/}
+                {/*    Utip*/}
+                {/*  </a>*/}
+                {/*</div>*/}
                 <div className="d-inline-block" style={{width: '20%'}}>
-                  <a href="https://utip.io/xurei" target="_blank" rel="noreferrer">
-                    <IconUtip color={props.config.colorPalette.common.primary} size={50}/>
+                  <a href="https://ko-fi.com/xurei" target="_blank" rel="noreferrer">
+                    <IconKofi color={props.config.colorPalette.common.primary} size={50}/>
                     <br/>
                     Utip
                   </a>
@@ -48,9 +48,13 @@ class OverlayDonate extends React.Component {
           </FlexLayout>
         </div>
       </OverlayWrapper>
-    );
-  }
-}
+  );
+};
+
+OverlayDonate.propTypes = {
+  config: PropTypes.object.isRequired,
+  onClose: PropTypes.func.isRequired,
+};
 
 //language=SCSS
 OverlayDonate = Styled(OverlayDonate)`

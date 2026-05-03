@@ -1,24 +1,17 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
-import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
 import { Vcenter } from './vcenter.jsx';
 
-class OverlayWrapper extends React.Component {
-  static propTypes = {
-    onClose: PropTypes.func,
-    width: PropTypes.string,
+function OverlayWrapperUnstyled(props) {
+  const handleClose = (e) => {
+    if (props.onClose && (e.currentTarget === e.target || e.currentTarget === e.target.parentNode || e.currentTarget === e.target.parentNode.parentNode)) {
+      props.onClose();
+    }
   };
   
-  constructor(props) {
-    super(props);
-    this.handleClose = this.handleClose.bind(this);
-  }
-  
-  render() {
-    const props = this.props;
-    return (
-      <div className={props.className} onClick={this.handleClose}>
+  return (
+      <div className={props.className} onClick={handleClose}>
         <Vcenter>
           <div className="overlay__content" style={{maxWidth: props.width}}>
             {props.onClose && (
@@ -32,22 +25,11 @@ class OverlayWrapper extends React.Component {
           </div>
         </Vcenter>
       </div>
-    );
-  }
-  
-  handleClose(e) {
-    const props = this.props;
-    if (props.onClose && (e.currentTarget === e.target || e.currentTarget === e.target.parentNode || e.currentTarget === e.target.parentNode.parentNode)) {
-      props.onClose();
-    }
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
-  }
+  );
 }
+
 //language=SCSS
-OverlayWrapper = Styled(OverlayWrapper)`
+const OverlayWrapper = Styled(OverlayWrapperUnstyled)`
 & {
   position: absolute;
   top: 0;
@@ -96,5 +78,10 @@ OverlayWrapper = Styled(OverlayWrapper)`
   }
 }
 `;
+
+OverlayWrapper.propTypes = {
+  onClose: PropTypes.func,
+  width: PropTypes.string,
+};
 
 export { OverlayWrapper };

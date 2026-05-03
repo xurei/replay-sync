@@ -11,18 +11,8 @@ const watchedBlocks = [
   //{ begin: 1619101081000 + 3600*53*1000, end: 1619101081000 + 3600*1000  + 3600*53*1000},
 ];
 
-class Timeline extends React.Component {
-  static propTypes = {
-    config: PropTypes.object.isRequired,
-    vods: PropTypes.object.isRequired,
-    time: PropTypes.number.isRequired,
-    onRemoveStreamer: PropTypes.func.isRequired,
-    statsMode: PropTypes.bool,
-    disabled: PropTypes.bool,
-  };
-  
-  calculateLeft(timestamp, totalLength) {
-    const props = this.props;
+let Timeline = React.memo(function Timeline(props) {
+  const calculateLeft = (timestamp, totalLength) => {
     let out = 0;
     for (let timeframe of props.config.timeFrames) {
       if (timeframe.startTimestamp <= timestamp && timestamp <= timeframe.endTimestamp) {
@@ -32,11 +22,9 @@ class Timeline extends React.Component {
         out += (timeframe.endTimestamp - timeframe.startTimestamp) / totalLength;
       }
     }
-  }
+  };
   
-  render() {
-    const props = this.props;
-    const vods = Object.values(props.vods || {});
+  const vods = Object.values(props.vods || {});
     
     const daysArray = buildDaysArray(props.config.timeFrames, props.config.timelineType);
     const totalLength = daysArray.reduce((acc, dayObj) => {
@@ -58,7 +46,7 @@ class Timeline extends React.Component {
             <DayBlocks config={props.config}/>
             <div className="timeline__base-line"/>
             {props.statsMode && vods.map(vod => {
-              const left = this.calculateLeft(vod.created_ts, totalLength);
+              const left = calculateLeft(vod.created_ts, totalLength);
               return (
                 <div key={vod.id} className={`timeline__vod-block original`} style={{
                   left: `${left*100}%`,
@@ -68,7 +56,7 @@ class Timeline extends React.Component {
               );
             })}
             {vods.map(vod => {
-              const left = this.calculateLeft(vod.created_ts, totalLength);
+              const left = calculateLeft(vod.created_ts, totalLength);
               return (
                 <div key={vod.id}
                   className={`timeline__vod-block ${vod.permanent_id ? 'persisted' + (vod.permanent_id.confirmed ? ' confirmed':'') + (vod.permanent_id.error ? ' error':'') : ''} ${props.disabled ? ' disabled': ''}`}
@@ -94,12 +82,16 @@ class Timeline extends React.Component {
         </div>
       );
     }
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
-  }
-}
+}, (prevProps, nextProps) => deepEqual(prevProps, nextProps));
+
+Timeline.propTypes = {
+  config: PropTypes.object.isRequired,
+  vods: PropTypes.object.isRequired,
+  time: PropTypes.number.isRequired,
+  onRemoveStreamer: PropTypes.func.isRequired,
+  statsMode: PropTypes.bool,
+  disabled: PropTypes.bool,
+};
 //language=SCSS
 Timeline = Styled(Timeline)`
 & {

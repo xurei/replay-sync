@@ -1,18 +1,10 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
-import deepEqual from 'deep-eql';
 
-class IconGift extends React.Component {
-  static propTypes = {
-    color: PropTypes.string,
-    size: PropTypes.number,
-  };
-  
-  render() {
-    const props = this.props;
-    const color = props.color || '#000';
-    const size = props.size || 32;
-    return (
+function IconGift(props) {
+  const color = props.color || '#000';
+  const size = props.size || 32;
+  return (
       <span className={`d-inline-block ${props.className || ''}`}>
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" style={{fill: color, width: size}}>
           <path d="M478.609,99.726H441.34c4.916-7.78,8.16-16.513,9.085-25.749C453.38,44.46,437.835,18,411.37,6.269
@@ -29,12 +21,12 @@ class IconGift extends React.Component {
           <path d="M289.391,233.291v278.261h155.826c18.442,0,33.391-14.949,33.391-33.391v-244.87H289.391z"/>
         </svg>
       </span>
-    );
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
-  }
+  );
 }
+
+IconGift.propTypes = {
+  color: PropTypes.string,
+  size: PropTypes.number,
+};
 
 export { IconGift };

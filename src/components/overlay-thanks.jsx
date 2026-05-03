@@ -1,17 +1,10 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
-import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
 import { OverlayWrapper } from './overlay-wrapper';
 
-class OverlayThanks extends React.Component {
-  static propTypes = {
-    onClose: PropTypes.func.isRequired,
-  };
-  
-  render() {
-    const props = this.props;
-    return (
+function OverlayThanksUnstyled(props) {
+  return (
       <OverlayWrapper width={'700px'} onClose={props.onClose}>
         <div className={props.className}>
           <h1>♥<span style={{display:'inline-block', width: 25}}/>Remerciements<span style={{display:'inline-block', width: 25}}/>♥</h1>
@@ -62,16 +55,11 @@ class OverlayThanks extends React.Component {
           <h1>♥ ♥ ♥</h1>
         </div>
       </OverlayWrapper>
-    );
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
-  }
+  );
 }
 
 //language=SCSS
-OverlayThanks = Styled(OverlayThanks)`
+const OverlayThanks = Styled(OverlayThanksUnstyled)`
 & {
   text-align: center;
   padding: 0 20px;
@@ -82,5 +70,9 @@ OverlayThanks = Styled(OverlayThanks)`
   }
 }
 `;
+
+OverlayThanks.propTypes = {
+  onClose: PropTypes.func.isRequired,
+};
 
 export { OverlayThanks };
