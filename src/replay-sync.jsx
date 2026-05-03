@@ -12,7 +12,6 @@ function ReplaySync(props) {
   
   return (
     <div className={props.className}>
-      {/*coucou*/}
       <MainView
         config={config}
         streamersObj={props.streamersObj}
