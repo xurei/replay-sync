@@ -1,5 +1,5 @@
 {
-  "name": "replay-sync",
+  "name": "@xurei/replay-sync",
   "version": "0.6.5",
   "description": "",
   "main": "index.js",
@@ -19,9 +19,9 @@
     "date-fns-tz": "^1.1.4",
     "deep-eql": "^4.0.0",
     "prop-types": "^15.7.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
-    "react-is": "^18.3.1",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-is": "^19.0.0",
     "react-markdown": "^6.0.2",
     "react-youtube": "^7.13.1",
     "store": "^2.0.12",
@@ -45,7 +45,7 @@
     "cross-env": "^7.0.3"
   },
   "peerDependencies": {
-    "styled-components": "^5.2.3"
+    "styled-components": "^6.0.0"
   },
   "eslintConfig": {
     "extends": [
