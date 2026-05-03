@@ -16,7 +16,7 @@ class DayBlocks extends React.Component {
   render() {
     const props = this.props;
     
-    const daysArray = buildDaysArray(props.config.timeFrames);
+    const daysArray = buildDaysArray(props.config.timeFrames, props.config.timelineType);
   
     const totalLength = daysArray.reduce((acc, dayObj) => {
       if (dayObj.type === 'ellipsis') {

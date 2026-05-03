@@ -3,7 +3,7 @@ import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import Styled from 'styled-components';
 
 import { OverlayWrapper } from './overlay-wrapper';
-import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
+import { FlexLayout, FlexChild } from './flex-layout';
 import { IconGithub } from './icon-github';
 import { IconUtip } from './icon-utip';
 

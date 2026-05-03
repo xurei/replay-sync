@@ -1,6 +1,6 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types';
-import { VCenter } from 'xureact';
+import { Vcenter } from './vcenter.jsx';
 import deepEqual from 'deep-eql'; //eslint-disable-line no-unused-vars
 
 class MockPlayer extends React.Component {
@@ -87,7 +87,7 @@ class MockPlayer extends React.Component {
     const state = this.state;
     return (
       <div id={this.embedId} style={{ height: '100%', textAlign: 'center' }}>
-        <VCenter>
+        <Vcenter>
           <div>Status : {state.status}</div>
           <div>Time : {state.time} | {props.currentTime}</div>
           <div>
@@ -105,7 +105,7 @@ class MockPlayer extends React.Component {
           </div>
           <pre>{JSON.stringify(props, null, '  ')}</pre>
           <pre>{JSON.stringify(state, null, '  ')}</pre>
-        </VCenter>
+        </Vcenter>
       </div>
     );
   }

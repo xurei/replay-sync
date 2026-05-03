@@ -4,7 +4,7 @@ import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
 import { Timeline } from './timeline';
 
-import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
+import { FlexLayout, FlexChild } from './flex-layout';
 import { DayBlocks } from './day-blocks';
 import { IconEyeClosed } from './icon-eye-closed';
 import { IconEyeOpen } from './icon-eye-open';

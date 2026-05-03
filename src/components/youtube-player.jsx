@@ -107,7 +107,7 @@ class YoutubePlayer extends React.Component {
       <YouTube
         videoId={props.video_id}
         opts={this.youtubeOptions}
-        containerClassName="fullh"
+        iframeClassName="fullh"
         className="fullh"
         
         onPause={e => {

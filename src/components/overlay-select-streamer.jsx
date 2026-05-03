@@ -1,7 +1,6 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
-import deepEqual from 'deep-eql';
-import { FlexChild, FlexLayout } from 'xureact/lib/cjs/components/layout/flex-layout';
+import { FlexLayout, FlexChild } from './flex-layout';
 import Styled from 'styled-components';
 import { OverlayWrapper } from './overlay-wrapper';
 
@@ -42,7 +41,7 @@ class OverlaySelectStreamer extends React.Component {
       const rpNameLowercase = streamerName.rp_name.toLowerCase();
       const searchValueLowercase = state.searchValue.toLowerCase();
       return (
-        login.indexOf(searchValueLowercase) !== -1
+        login.toLowerCase().indexOf(searchValueLowercase) !== -1
         || rpNameLowercase.indexOf(searchValueLowercase) !== -1
       );
     });
@@ -106,6 +105,9 @@ class OverlaySelectStreamer extends React.Component {
                   </div>
                 ))}
               </div>
+            </FlexChild>
+            <FlexChild height={60} grow={0}>
+              <p className="text-center">Pro-tip: Utilise Maj+Clic pour sélectionner plusieur streamers.</p>
             </FlexChild>
           </FlexLayout>
         </div>

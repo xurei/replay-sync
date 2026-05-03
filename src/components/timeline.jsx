@@ -38,7 +38,7 @@ class Timeline extends React.Component {
     const props = this.props;
     const vods = Object.values(props.vods || {});
     
-    const daysArray = buildDaysArray(props.config.timeFrames);
+    const daysArray = buildDaysArray(props.config.timeFrames, props.config.timelineType);
     const totalLength = daysArray.reduce((acc, dayObj) => {
       if (dayObj.type === 'ellipsis') {
         return acc;

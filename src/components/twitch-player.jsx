@@ -1,7 +1,6 @@
 import React, {useEffect, useMemo, useState} from 'react'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql'; //eslint-disable-line no-unused-vars
 import { tsToVodTime } from '../time-util.js';
-import '../vendor/twitch_embed_v1';
 
 const Twitch = globalThis.Twitch;
 

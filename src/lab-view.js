@@ -1,5 +1,5 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
-import { FlexLayout, FlexChild } from 'xureact/lib/module/components/layout/flex-layout';
+import { FlexLayout, FlexChild } from './components/flex-layout';
 import Styled from 'styled-components';
 import { MultiPlayers } from './components/multi-players';
 import { MultiTimelines } from './components/multi-timelines';

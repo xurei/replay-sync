@@ -2,7 +2,7 @@ import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
-import { VCenter } from 'xureact';
+import { Vcenter } from './vcenter.jsx';
 
 class OverlayWrapper extends React.Component {
   static propTypes = {
@@ -19,7 +19,7 @@ class OverlayWrapper extends React.Component {
     const props = this.props;
     return (
       <div className={props.className} onClick={this.handleClose}>
-        <VCenter>
+        <Vcenter>
           <div className="overlay__content" style={{maxWidth: props.width}}>
             {props.onClose && (
               <div className="overlay__close-button" onClick={props.onClose}>
@@ -30,7 +30,7 @@ class OverlayWrapper extends React.Component {
               {props.children}
             </div>
           </div>
-        </VCenter>
+        </Vcenter>
       </div>
     );
   }

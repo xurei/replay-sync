@@ -1,7 +1,7 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
 import deepEqual from 'deep-eql';
-import { VCenter } from 'xureact';
+import { Vcenter } from './vcenter.jsx';
 import Styled from 'styled-components';
 import { setSubState } from '../state-util';
 import { tsToTime } from '../time-util';
@@ -166,7 +166,7 @@ class MultiPlayers extends React.Component {
               return (
                 <div key={index} className="multiplayers__player multiplayers__player-muted multiplayers__player-offline">
                   {this.renderPlayerOverlayControls(streamer, index)}
-                  <VCenter>
+                  <Vcenter>
                     <div className="text-center">
                       <div className="text-big">{streamer.streamerName}</div>
                       <div className="text-big">OFFLINE</div>
@@ -176,7 +176,7 @@ class MultiPlayers extends React.Component {
                         {tsToTime(nextVodTime)} <IconFastForward color="#fff" size={18}/>
                       </div>
                     </div>
-                  </VCenter>
+                  </Vcenter>
                 </div>
               );
             }

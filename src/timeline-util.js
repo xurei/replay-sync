@@ -1,7 +1,32 @@
 import { atMidnigth } from './date-util';
 import { addDays } from 'date-fns/esm';
 
-export function buildDaysArray(timeFrames) {
+export function buildDaysArray(timeFrames, timelineType) {
+  switch (timelineType) {
+    case 'per-timeframe': {
+      return buildDaysArrayPerTimeframe(timeFrames);
+    }
+    
+    default:
+    case 'per-day': {
+      return buildDaysArrayPerDay(timeFrames);
+    }
+  }
+}
+
+function buildDaysArrayPerTimeframe(timeFrames) {
+  return timeFrames.map((timeframe, index) => {
+    return {
+      type: 'day',
+      firstOfTimeFrame: true,
+      index: index,
+      start: timeframe.startTimestamp,
+      duration: timeframe.endTimestamp - timeframe.startTimestamp,
+    };
+  });
+}
+
+function buildDaysArrayPerDay(timeFrames) {
   const out = [];
   let index = 1;
   timeFrames.forEach(timeframe => {
@@ -24,12 +49,8 @@ export function buildDaysArray(timeFrames) {
       ++index;
     }
     out[out.length-1].lastOfTimeFrame = true;
-    /*out.push({
-      type: 'ellipsis',
-    });*/
   });
   out[out.length-1].lastOfTimeFrame = false;
   
-  //out.pop();
   return out;
 }

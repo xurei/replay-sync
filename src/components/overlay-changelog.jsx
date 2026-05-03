@@ -5,7 +5,7 @@ import Styled from 'styled-components';
 import { OverlayWrapper } from './overlay-wrapper';
 import changelog from '../CHANGELOG.md?raw';
 import ReactMarkdown from 'react-markdown';
-import { FlexChild, FlexLayout } from 'xureact/lib/module/components/layout/flex-layout';
+import { FlexLayout, FlexChild } from './flex-layout';
 import { IconDiscord } from './icon-discord';
 import { IconBluesky } from './icon-bluesky';
 import { IconTwitch } from './icon-twitch';

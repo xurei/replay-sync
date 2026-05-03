@@ -1,9 +1,7 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
-import { FlexLayout, FlexChild } from 'xureact/lib/module/components/layout/flex-layout';
+import { FlexLayout, FlexChild } from './components/flex-layout';
 import Styled from 'styled-components';
-import { zonedTimeToUtc } from 'date-fns-tz';
-import { setDayOfYear } from 'date-fns';
 import { MultiPlayers } from './components/multi-players';
 import { MultiTimelines } from './components/multi-timelines';
 import { OverlaySelectStreamer } from './components/overlay-select-streamer';
@@ -15,7 +13,7 @@ import { IconCalendar } from './components/icon-calendar';
 import { IconDonate } from './components/icon-donate';
 import { IconGift } from './components/icon-gift';
 import { OverlayDonate } from './components/overlay-donate';
-import { formatDateTimeSeconds, formatFullTime, getDayOfYear } from './date-util';
+import { formatDateTimeSeconds, getDayOfYear } from './date-util';
 import { hasNewVersion, setLastVersionVisited } from './version';
 import { EventsPanel } from './components/events-panel';
 
@@ -127,10 +125,10 @@ class PlayerView extends React.Component {
   
   componentDidUpdate(prevProps, prevState, snapshot) {
     const state = this.state;
-    let date = new Date(state.global_time);
-    const strDate = `J${getDayOfYear(date)-this.initialDayOfYear+1}T${formatFullTime(date)}`;
-    //strDate.substring(0, strDate.length-5)+'Z';
-    //document.location.hash = `${strDate}&${state.streamers.join(',')}`;
+    const shareTime = (Number(state.global_time) / 1000).toFixed(0);
+    if (shareTime % 60 === 0) {
+      document.location.hash = this.buildShareHash();
+    }
   }
   
   createStreamerObj(streamerName) {
@@ -141,7 +139,7 @@ class PlayerView extends React.Component {
   }
   
   parseShareLink() {
-    const hash = document.location.hash.substr(1).split('&');
+    const hash = document.location.hash.substring(1).split('&');
   
     // J115T01:13:11 => 2021-04-23T12:34:56+02:00
     if (hash.length >= 2) {
@@ -164,15 +162,19 @@ class PlayerView extends React.Component {
   }
   
   buildShareLink() {
-    const state = this.state;
     const location = document.location;
     const port = (location.port && location.port !== '' && location.port !== 80 && location.port !== 443) ? `:${location.port}` : '';
     const baseUrl = `${location.protocol}//${location.hostname}${port}${location.pathname}`;
     
+    return `${baseUrl}#${this.buildShareHash()}`;
+  }
+  
+  buildShareHash() {
+    const state = this.state;
     const streamers = state.streamers.map(streamer=>streamer.name).join(':');
     const dateOfEvent = Math.floor(state.global_time / 1000);
     
-    return `${baseUrl}#${dateOfEvent}&${streamers}`;
+    return `${dateOfEvent}&${streamers}`;
   }
   
   render() {
@@ -339,7 +341,9 @@ class PlayerView extends React.Component {
     this.setState(state => ({
       ...state,
       selectStreamerShown: true,
-    }));
+    }), () => {
+      document.location.hash = this.buildShareHash();
+    });
   }
   
   handleRemovePlayer(streamerToRemove) {
@@ -348,6 +352,8 @@ class PlayerView extends React.Component {
         ...state,
         streamers: state.streamers.filter(streamer => streamer.name !== streamerToRemove)
       };
+    }, () => {
+      document.location.hash = this.buildShareHash();
     });
   }
   
@@ -355,7 +361,9 @@ class PlayerView extends React.Component {
     this.setState(state => ({
       ...state,
       global_time: targetTime,
-    }));
+    }), () => {
+      document.location.hash = this.buildShareHash();
+    });
   }
   
   handleShowEventsPanel() {
