@@ -23,9 +23,8 @@ class EventsPanel extends React.Component {
   
   render() {
     const props = this.props;
-    const state = this.state;
     return (
-      <div className={`${props.className} fullh`}>
+      <StyledWrapper className={`${props.className} fullh`}>
         <h3 className="text-center">Evènements</h3>
         {props.events.map((eventData, eventIndex) => (
           <div key={eventIndex} data-eventindex={eventIndex} className="fullw event-line clickable" onClick={this.handleSelectEvent}>
@@ -44,7 +43,7 @@ class EventsPanel extends React.Component {
             </FlexLayout>
           </div>
         ))}
-      </div>
+      </StyledWrapper>
     );
   }
   
@@ -66,7 +65,7 @@ class EventsPanel extends React.Component {
   }
 }
 //language=SCSS
-EventsPanel = Styled(EventsPanel)`
+const StyledWrapper = Styled.div`
 & {
   position: absolute;
   z-index: 9;

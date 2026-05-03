@@ -1,18 +1,7 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
 import { FlexLayout, FlexChild } from './components/flex-layout';
-import Styled from 'styled-components';
-import { MultiPlayers } from './components/multi-players';
-import { MultiTimelines } from './components/multi-timelines';
-import { OverlaySelectStreamer } from './components/overlay-select-streamer';
-import { OverlayThanks } from './components/overlay-thanks';
-import { version } from './version';
-import { OverlayChangelog } from './components/overlay-changelog';
-import { metaByStreamer } from './meta';
-import { formatDateTimeSeconds, formatFullTime, formatTime, getDayOfYear } from './date-util';
-import { zonedTimeToUtc } from 'date-fns-tz';
-import { setDayOfYear, setYear } from 'date-fns';
+import { getDayOfYear } from './date-util';
 import { TwitchPlayer } from './components/twitch-player';
-import deepEqual from 'deep-eql';
 
 const initialTimestamp = new Date('2021-04-21').getTime();
 const initialDayOfYear = getDayOfYear(initialTimestamp);

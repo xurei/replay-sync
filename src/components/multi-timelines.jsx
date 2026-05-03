@@ -22,7 +22,7 @@ let streamersObj = null;
 
 function noop() {}
 
-class MultiTimelines extends React.Component {
+class MultiTimelinesUnstyled extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     streamersObj: PropTypes.object.isRequired,
@@ -102,8 +102,7 @@ class MultiTimelines extends React.Component {
     const props = this.props;
     const state = this.state;
     return (
-      <div className={`${props.className} ${props.statsMode ? 'stats-mode' : ''}`}>
-        <FlexLayout direction="row">
+        <FlexLayout direction="row" className={`multi-timelines ${props.className} ${props.statsMode ? 'stats-mode' : ''}`}>
           <FlexChild grow={0} style={{zIndex: 2}} className="multitimeline__left-pane">
             <div className="text-right dark-bg multitimeline__control-buttons">
               <span>
@@ -150,7 +149,7 @@ class MultiTimelines extends React.Component {
             </div>
           </FlexChild>
           
-          <FlexChild width={1} grow={1} style={{zIndex: 1}}>
+          <FlexChild width={1} grow={1} style={{zIndex: 1}} className="multitimeline__right-pane">
             <div className="prel" style={{width: `${100*state.zoom}%`, height: '100%', left: `-${state.horizontalScroll*100}%`}}>
               <div className="multitimeline__days">
                 {this.renderDays()}
@@ -196,7 +195,6 @@ class MultiTimelines extends React.Component {
             </div>
           </FlexChild>
         </FlexLayout>
-      </div>
     );
   }
   
@@ -324,7 +322,7 @@ class MultiTimelines extends React.Component {
   }
 }
 //language=SCSS
-MultiTimelines = Styled(MultiTimelines)`
+const MultiTimelines = Styled(MultiTimelinesUnstyled)`
   & {
     position: relative;
     padding-bottom: 5px;
@@ -335,6 +333,9 @@ MultiTimelines = Styled(MultiTimelines)`
       background: #0E0E10;
       padding-bottom: 3px;
       width: ${LEFT_PANE_W}px;
+    }
+    .multitimeline__right-pane {
+      width: calc(100vw - ${LEFT_PANE_W}px - 40px) !important;
     }
 
     .multitimeline__days {

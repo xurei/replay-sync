@@ -15,14 +15,10 @@
   },
   "dependencies": {
     "@babel/runtime-corejs3": "^7.28.4",
-    "date-fns": "^2.21.2",
-    "date-fns-tz": "^1.1.4",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
     "deep-eql": "^4.0.0",
     "prop-types": "^15.7.2",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "react-is": "^19.0.0",
-    "react-markdown": "^6.0.2",
     "react-youtube": "^7.13.1",
     "store": "^2.0.12",
     "uuid": "^14.0.0"
@@ -45,7 +41,11 @@
     "cross-env": "^7.0.3"
   },
   "peerDependencies": {
-    "styled-components": "^6.0.0"
+    "styled-components": "^6.0.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-is": "^19.0.0",
+    "react-markdown": "^6.0.2"
   },
   "eslintConfig": {
     "extends": [

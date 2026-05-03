@@ -194,7 +194,7 @@ class PlayerView extends React.Component {
     });
     
     return (
-      <div className={props.className}>
+      <StyledWrapper {...props}>
         <style>{style}</style>
         <div style={{ height: '100vh', width: '100vw'}}>
           {state.thanksShown && (
@@ -334,7 +334,7 @@ class PlayerView extends React.Component {
             </FlexChild>
           </FlexLayout>
         </div>
-      </div>
+      </StyledWrapper>
     );
   }
   
@@ -438,7 +438,7 @@ class PlayerView extends React.Component {
 }
 
 //language=SCSS
-PlayerView = Styled(PlayerView)`
+const StyledWrapper = Styled.div`
 & {
   iframe {
     height: 100%;

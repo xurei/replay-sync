@@ -121,7 +121,7 @@ class MultiPlayers extends React.Component {
     const nbPlayers = state.players.length;
     
     return (
-      <div className={props.className}>
+      <StyledWrapper {...props}>
         {/*<div className="overlay">*/}
         {/*  <pre>{JSON.stringify(state, null, '  ')}</pre>*/}
         {/*</div>*/}
@@ -182,7 +182,7 @@ class MultiPlayers extends React.Component {
             }
           })}
         </div>
-      </div>
+      </StyledWrapper>
     );
   }
   
@@ -270,7 +270,7 @@ class MultiPlayers extends React.Component {
 }
 
 //language=SCSS
-MultiPlayers = Styled(MultiPlayers)`
+const StyledWrapper = Styled.div`
 & {
   display: block;
   height: 100%;

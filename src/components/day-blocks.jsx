@@ -29,7 +29,7 @@ class DayBlocks extends React.Component {
     
     let curLeftRatio = 0;
     return (
-      <div className={props.className}>
+      <StyledWrapper className={props.className}>
         {daysArray.map(dayObj => {
           const divW = dayObj.duration / totalLength;
           const out = (
@@ -49,7 +49,7 @@ class DayBlocks extends React.Component {
           curLeftRatio += divW;
           return out;
         })}
-      </div>
+      </StyledWrapper>
     );
   }
   
@@ -59,7 +59,7 @@ class DayBlocks extends React.Component {
 }
 
 //language=SCSS
-DayBlocks = Styled(DayBlocks)`
+const StyledWrapper = Styled.div`
 & {
   .day-blocks__day-block {
     background: #0e0e10;

@@ -1,5 +1,5 @@
 import { atMidnigth } from './date-util';
-import { addDays } from 'date-fns/esm';
+import { addDays } from 'date-fns/addDays';
 
 export function buildDaysArray(timeFrames, timelineType) {
   switch (timelineType) {

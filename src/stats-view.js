@@ -1,6 +1,4 @@
 import React from 'react'; //eslint-disable-line no-unused-vars
-import PropTypes from 'prop-types'; //eslint-disable-line no-unused-vars
-import deepEqual from 'deep-eql';
 import Styled from 'styled-components';
 import { MultiTimelines } from './components/multi-timelines';
 
@@ -21,7 +19,7 @@ class StatsView extends React.Component {
     console.log(props);
     
     return (
-      <div className={props.className}>
+      <StyledWrapper className={props.className}>
         <style>{style}</style>
         <MultiTimelines
           config={props.config}
@@ -31,17 +29,13 @@ class StatsView extends React.Component {
           streamers={Object.keys(metaByStreamer).map(streamer => ({ name: streamer, visible: true }))}
           statsMode
         />
-      </div>
+      </StyledWrapper>
     );
-  }
-  
-  shouldComponentUpdate(nextProps) {
-    return !deepEqual(this.props, nextProps);
   }
 }
 
 //language=SCSS
-StatsView = Styled(StatsView)`
+const StyledWrapper = Styled.div`
 & {
   padding: 20px;
   overflow: scroll;
