@@ -369,17 +369,19 @@ const MultiTimelines = Styled(MultiTimelinesUnstyled)`
 
     .multitimeline__toggle-timelines {
       padding-top: 12px !important;
+      position: relative;
+      overflow: hidden;
 
       &:before {
         content: "⌃";
+        color: #eee;
       }
 
-      &:hover {
-        padding-top: 0 !important;
-        padding-bottom: 10px !important;
-
+      &:hover, &:focus {
         &:before {
           content: "⌄";
+          position: relative;
+          top: -10px;
         }
       }
 
@@ -387,17 +389,13 @@ const MultiTimelines = Styled(MultiTimelinesUnstyled)`
       line-height: 20px;
 
       &.hidden {
-        padding-top: 0 !important;
-        padding-bottom: 10px !important;
-
         &:before {
           content: "⌄";
+          position: relative;
+          top: -10px;
         }
 
-        &:hover {
-          padding-top: 12px !important;
-          padding-bottom: 5px !important;
-
+        &:hover, &:focus {
           :before {
             content: "⌃";
           }
