@@ -12,19 +12,58 @@ const watchedBlocks = [
 ];
 
 let Timeline = React.memo(function Timeline(props) {
-  const calculateLeft = (timestamp, totalLength) => {
-    let out = 0;
+  const getMatchingTimeframe = (vod) => {
     for (let timeframe of props.config.timeFrames) {
-      if (timeframe.startTimestamp <= timestamp && timestamp <= timeframe.endTimestamp) {
-        return out + (timestamp - timeframe.startTimestamp) / totalLength;
+      const vodStart = vod.createdTs;
+      const vodEnd = vod.createdTs+vod.duration_ms;
+      // Start time inside timeframe  | ---|--  and | -- |
+      if (timeframe.startTimestamp <= vodStart && vodStart <= timeframe.endTimestamp) {
+        return timeframe;
+      }
+      // End time inside timeframe   -|--- |   (and | -- | but arleady matched)
+      else if (timeframe.startTimestamp <= vodEnd && vodEnd <= timeframe.endTimestamp) {
+        return timeframe;
+      }
+      // timeframe fully inside vod --|----|--
+      else if (vodStart <= timeframe.startTimestamp && timeframe.endTimestamp <= vodEnd) {
+        return timeframe;
+      }
+    }
+    return null;
+  };
+  /// Make sure the VOD is inside the timeframes. If the VOD started before, update the duration and
+  /// start_time to match the beginning of the timeframe
+  const clampVod = (vod) => {
+    const timeframe = getMatchingTimeframe(vod);
+    if (!timeframe) {
+      // Fallback - should not happen
+      return vod;
+    }
+    
+    vod = {...vod};
+    vod.startTimestamp = Math.max(vod.createdTs, timeframe.startTimestamp);
+    return vod;
+  };
+  const calculateLeft = (vod, totalLength) => {
+    const matchingTimeframe = getMatchingTimeframe(vod);
+    if (!matchingTimeframe) {
+      console.error(`No matching timeline found for VOD ${vod.id}`);
+      // Fallback - should not happen
+      return 100.0;
+    }
+    let out = 0.0;
+    for (let timeframe of props.config.timeFrames) {
+      if (matchingTimeframe === timeframe) {
+        return out + (vod.createdTs - timeframe.startTimestamp) / totalLength;
       }
       else {
         out += (timeframe.endTimestamp - timeframe.startTimestamp) / totalLength;
       }
     }
+    return out;
   };
   
-  const vods = Object.values(props.vods || {});
+  const vods = Object.values(props.vods || {}).filter(getMatchingTimeframe);
     
     const daysArray = buildDaysArray(props.config.timeFrames, props.config.timelineType);
     const totalLength = daysArray.reduce((acc, dayObj) => {
@@ -45,8 +84,8 @@ let Timeline = React.memo(function Timeline(props) {
           <div className="timeline__lines">
             <DayBlocks config={props.config}/>
             <div className="timeline__base-line"/>
-            {props.statsMode && vods.map(vod => {
-              const left = calculateLeft(vod.created_ts, totalLength);
+            {props.statsMode && vods.map(clampVod).map(vod => {
+              const left = calculateLeft(vod, totalLength);
               return (
                 <div key={vod.id} className={`timeline__vod-block original`} style={{
                   left: `${left*100}%`,
@@ -55,11 +94,13 @@ let Timeline = React.memo(function Timeline(props) {
                 </div>
               );
             })}
-            {vods.map(vod => {
-              const left = calculateLeft(vod.created_ts, totalLength);
+            {vods.map(clampVod).map(vod => {
+              const left = calculateLeft(vod, totalLength);
+              
               return (
                 <div key={vod.id}
                   className={`timeline__vod-block ${vod.permanent_id ? 'persisted' + (vod.permanent_id.confirmed ? ' confirmed':'') + (vod.permanent_id.error ? ' error':'') : ''} ${props.disabled ? ' disabled': ''}`}
+                  data-vod={vod.id}
                   style={{
                     left: `${left*100}%`,
                     width: `${vod.duration_ms*100 / totalLength}%`,
@@ -68,7 +109,7 @@ let Timeline = React.memo(function Timeline(props) {
               );
             })}
             {/*{watchedBlocks.map(watchedBlock => {*/}
-            {/*  const left = this.calculateLeft(vod.created_ts, totalLength);*/}
+            {/*  const left = this.calculateLeft(vod.createdTs, totalLength);*/}
             {/*  return (*/}
             {/*    <div key={watchedBlock.begin} className={`timeline__watched-block`} style={{*/}
             {/*      left: `${left*100}%`,*/}

@@ -1,5 +1,5 @@
-function getVideoEnd(la_video) {
-  return la_video.createdTs + la_video.duration_ms;
+function getVideoEnd(video) {
+  return video.createdTs + video.duration_ms;
 }
 
 export function mergeTimelines(/*Object*/ metaByStreamer, /*String[]*/ streamers) {
