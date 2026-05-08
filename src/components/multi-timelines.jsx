@@ -192,6 +192,20 @@ class MultiTimelinesUnstyled extends React.Component {
                   </div>
                 </div>
               )}
+              {!props.statsMode && (
+                <div className="multitimeline__shortcuts-overlay">
+                  <table>
+                    <tr>
+                      <td className="text-right">Zoom</td>
+                      <td>scroll</td>
+                    </tr>
+                    <tr>
+                      <td className="text-right">Slide</td>
+                      <td>shift+scroll<br/>scroll horizontal</td>
+                    </tr>
+                  </table>
+                </div>
+              )}
             </div>
           </FlexChild>
         </FlexLayout>
@@ -295,9 +309,11 @@ class MultiTimelinesUnstyled extends React.Component {
   }
   
   handleWheel(e) {
-    if (Math.abs(e.deltaX) > 0.0001) {
+    const deltaX = e.shiftKey ? e.deltaY : e.deltaX;
+    
+    if (Math.abs(deltaX) > 0.0001) {
       console.log(e);
-      const delta = e.deltaX;
+      const delta = deltaX;
       this.setState(state => {
         const newHorizontalScroll = Math.max(0.0, Math.min(state.zoom - 1.0, state.horizontalScroll + (delta * 0.0001) * state.zoom));
         return {
@@ -306,7 +322,7 @@ class MultiTimelinesUnstyled extends React.Component {
         };
       });
     }
-    if (Math.abs(e.deltaY) > 0.0001) {
+    else if (Math.abs(e.deltaY) > 0.0001) {
       const delta = e.deltaY;
       const zoomDirection = delta > 0 ? zoomDecrement : 1/zoomDecrement;
       this.setState(state => {
@@ -542,6 +558,33 @@ const MultiTimelines = Styled(MultiTimelinesUnstyled)`
 
     a {
       color: #ddd;
+    }
+    
+    .multitimeline__shortcuts-overlay {
+      display: none;
+      position: absolute;
+      right: 16px;
+      margin-top: -150px;
+      font-size: 0.9em;
+      background: #282828;
+      border: solid 1px #444444;
+      box-shadow: 1px 1px 16px 1px rgba(0,0,0, 0.65);
+      border-radius: 5px;
+      padding: 5px;
+      
+      td {
+        vertical-align: top;
+        padding: 2px 8px;
+        &:first-child{
+          padding-left: 0;
+        }
+        &:last-child{
+          padding-right: 0;
+        }
+      }
+    }
+    &:hover .multitimeline__shortcuts-overlay {
+      display: block;
     }
   }
 `;
