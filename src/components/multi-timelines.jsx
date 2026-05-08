@@ -295,18 +295,31 @@ class MultiTimelinesUnstyled extends React.Component {
   }
   
   handleWheel(e) {
-    const delta = e.deltaY;
-    const zoomDirection = delta > 0 ? zoomDecrement : 1/zoomDecrement;
-    this.setState(state => {
-      const newZoom = Math.min(maxZoom, Math.max(1, state.zoom * zoomDirection));
-      const addedWidth = newZoom - state.zoom;
-      const newHorizontalScroll = (newZoom === 1) ? 0 : state.horizontalScroll + state.cursorPosition*addedWidth;
-      return {
-        ...state,
-        zoom: newZoom,
-        horizontalScroll: newHorizontalScroll,
-      };
-    });
+    if (Math.abs(e.deltaX) > 0.0001) {
+      console.log(e);
+      const delta = e.deltaX;
+      this.setState(state => {
+        const newHorizontalScroll = Math.max(0.0, Math.min(state.zoom - 1.0, state.horizontalScroll + (delta * 0.0001) * state.zoom));
+        return {
+          ...state,
+          horizontalScroll: newHorizontalScroll,
+        };
+      });
+    }
+    if (Math.abs(e.deltaY) > 0.0001) {
+      const delta = e.deltaY;
+      const zoomDirection = delta > 0 ? zoomDecrement : 1/zoomDecrement;
+      this.setState(state => {
+        const newZoom = Math.min(maxZoom, Math.max(1, state.zoom * zoomDirection));
+        const addedWidth = newZoom - state.zoom;
+        const newHorizontalScroll = (newZoom === 1) ? 0 : state.horizontalScroll + state.cursorPosition*addedWidth;
+        return {
+          ...state,
+          zoom: newZoom,
+          horizontalScroll: newHorizontalScroll,
+        };
+      });
+    }
   }
   
   handleClick(e) {
