@@ -195,14 +195,16 @@ class MultiTimelinesUnstyled extends React.Component {
               {!props.statsMode && (
                 <div className="multitimeline__shortcuts-overlay">
                   <table>
-                    <tr>
-                      <td className="text-right">Zoom</td>
-                      <td>scroll</td>
-                    </tr>
-                    <tr>
-                      <td className="text-right">Slide</td>
-                      <td>shift+scroll<br/>scroll horizontal</td>
-                    </tr>
+                    <tbody>
+                      <tr>
+                        <td className="text-right">Zoom</td>
+                        <td>scroll</td>
+                      </tr>
+                      <tr>
+                        <td className="text-right">Slide</td>
+                        <td>shift+scroll<br/>scroll horizontal</td>
+                      </tr>
+                    </tbody>
                   </table>
                 </div>
               )}
@@ -562,7 +564,7 @@ const MultiTimelines = Styled(MultiTimelinesUnstyled)`
     
     .multitimeline__shortcuts-overlay {
       display: none;
-      position: absolute;
+      position: fixed;
       right: 16px;
       margin-top: -150px;
       font-size: 0.9em;
