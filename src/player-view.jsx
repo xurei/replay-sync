@@ -281,7 +281,7 @@ class PlayerView extends React.Component {
                           </div>
                         )}
                         <div className="empty-view__add-streamer">
-                          Clique ici pour ajouter un streamer<br/>
+                          Clique ici pour ajouter une POV<br/>
                           <span style={{display: 'inline-block', width: 65}}> </span>
                           <span className="empty-view__add-streamer__arrow">⬇</span>
                         </div>
