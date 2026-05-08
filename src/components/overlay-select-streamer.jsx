@@ -81,8 +81,8 @@ class OverlaySelectStreamer extends React.Component {
               <div className="fullh scroll-y select-streamer__scrollview">
                 {this.getFilteredStreamers()
                 .map(login => (
-                  <div key={login} className="select-streamer__streamer" onClick={() => {
-                    this.props.onSelect(login);
+                  <div key={login} className="select-streamer__streamer" onClick={(e) => {
+                    this.props.onSelect(login, e.shiftKey);
                     //this.setStreamer(index, login);
                   }}>
                     <div className="select-streamer__avatar">
