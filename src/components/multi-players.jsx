@@ -12,7 +12,7 @@ import { YoutubePlayer } from './youtube-player';
 
 let metaByVid = null;
 
-class MultiPlayers extends React.Component {
+class MultiPlayersUnstyled extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     metaByVid: PropTypes.object.isRequired,
@@ -102,11 +102,11 @@ class MultiPlayers extends React.Component {
             newPlayers.push(this.initialPlayerState(streamerLogin));
           }
         });
-  
-        console.log({
-          ...state,
-          players: newPlayers,
-        })
+        
+        // console.log({
+        //   ...state,
+        //   players: newPlayers,
+        // });
         return {
           ...state,
           players: newPlayers,
@@ -121,7 +121,7 @@ class MultiPlayers extends React.Component {
     const nbPlayers = state.players.length;
     
     return (
-      <StyledWrapper {...props}>
+      <div className={`multi-players ${props.className}`}>
         {/*<div className="overlay">*/}
         {/*  <pre>{JSON.stringify(state, null, '  ')}</pre>*/}
         {/*</div>*/}
@@ -182,7 +182,7 @@ class MultiPlayers extends React.Component {
             }
           })}
         </div>
-      </StyledWrapper>
+      </div>
     );
   }
   
@@ -270,7 +270,7 @@ class MultiPlayers extends React.Component {
 }
 
 //language=SCSS
-const StyledWrapper = Styled.div`
+const MultiPlayers = Styled(MultiPlayersUnstyled)`
 & {
   display: block;
   height: 100%;

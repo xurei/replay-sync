@@ -55,7 +55,7 @@ function findNextVOD(streamerName, global_time) {
   return null;
 }
 
-class PlayerView extends React.Component {
+class PlayerViewUnstyled extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     metaByStreamer: PropTypes.object.isRequired,
@@ -194,7 +194,7 @@ class PlayerView extends React.Component {
     });
     
     return (
-      <StyledWrapper {...props}>
+      <div className={props.className}>
         <style>{style}</style>
         <div style={{ height: '100vh', width: '100vw'}}>
           {state.thanksShown && (
@@ -334,7 +334,7 @@ class PlayerView extends React.Component {
             </FlexChild>
           </FlexLayout>
         </div>
-      </StyledWrapper>
+      </div>
     );
   }
   
@@ -438,7 +438,7 @@ class PlayerView extends React.Component {
 }
 
 //language=SCSS
-const StyledWrapper = Styled.div`
+const PlayerView = Styled(PlayerViewUnstyled)`
 & {
   iframe {
     height: 100%;
