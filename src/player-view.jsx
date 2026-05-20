@@ -13,7 +13,7 @@ import { IconCalendar } from './components/icon-calendar';
 import { IconDonate } from './components/icon-donate';
 import { IconGift } from './components/icon-gift';
 import { OverlayDonate } from './components/overlay-donate';
-import { formatDateTimeSeconds, getDayOfYear } from './date-util';
+import { formatDateTimeSeconds } from './date-util';
 import { hasNewVersion, setLastVersionVisited } from './version';
 import { EventsPanel } from './components/events-panel';
 
@@ -55,7 +55,7 @@ function findNextVOD(streamerName, global_time) {
   return null;
 }
 
-class PlayerView extends React.Component {
+class PlayerViewUnstyled extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     metaByStreamer: PropTypes.object.isRequired,
@@ -94,18 +94,18 @@ class PlayerView extends React.Component {
   constructor(props) {
     super(props);
     metaByStreamer = props.metaByStreamer;
-    this.initialDayOfYear = getDayOfYear(props.config.timeFrames[0].startTimestamp);
     this.state.global_time = props.config.timeFrames[0].startTimestamp;
-    this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
     this.handleAddStreamer = this.handleAddStreamer.bind(this);
-    this.handleTimeChange = this.handleTimeChange.bind(this);
-    this.handleShareClick = this.handleShareClick.bind(this);
-    this.handleDonateClick = this.handleDonateClick.bind(this);
     this.handleChangelogClick = this.handleChangelogClick.bind(this);
-    this.handleThanksClick = this.handleThanksClick.bind(this);
-    this.handleToggleStreamerVisibility = this.handleToggleStreamerVisibility.bind(this);
-    this.handleShowEventsPanel = this.handleShowEventsPanel.bind(this);
+    this.handleDonateClick = this.handleDonateClick.bind(this);
+    this.handleRemovePlayer = this.handleRemovePlayer.bind(this);
     this.handleSelectEvent = this.handleSelectEvent.bind(this);
+    this.handleShareClick = this.handleShareClick.bind(this);
+    this.handleShowEventsPanel = this.handleShowEventsPanel.bind(this);
+    this.handleThanksClick = this.handleThanksClick.bind(this);
+    this.handleTimeChange = this.handleTimeChange.bind(this);
+    this.handleTimeUpdate = this.handleTimeUpdate.bind(this);
+    this.handleToggleStreamerVisibility = this.handleToggleStreamerVisibility.bind(this);
   }
   
   componentDidMount() {
@@ -123,13 +123,13 @@ class PlayerView extends React.Component {
     })
   }
   
-  componentDidUpdate(prevProps, prevState, snapshot) {
-    const state = this.state;
-    const shareTime = (Number(state.global_time) / 1000).toFixed(0);
-    if (shareTime % 60 === 0) {
-      document.location.hash = this.buildShareHash();
-    }
-  }
+  // componentDidUpdate(prevProps, prevState, snapshot) {
+  //   const state = this.state;
+  //   const shareTime = (Number(state.global_time) / 1000).toFixed(0);
+  //   if (shareTime % 60 === 0) {
+  //     document.location.hash = this.buildShareHash();
+  //   }
+  // }
   
   createStreamerObj(streamerName) {
     return {
@@ -170,6 +170,7 @@ class PlayerView extends React.Component {
   }
   
   buildShareHash() {
+    console.log('-- buildShareHash --');
     const state = this.state;
     const streamers = state.streamers.map(streamer=>streamer.name).join(':');
     const dateOfEvent = Math.floor(state.global_time / 1000);
@@ -185,16 +186,18 @@ class PlayerView extends React.Component {
     //const ytVideoId = allmeta[state.main_streamer][state.main_video_id].ytid;
     //const twVideoId = state.main_video_id;
   
+    console.log(state.streamers);
     const streamers = state.streamers.filter(streamer => streamer.visible).map(streamer => {
       return {
         streamerName: streamer.name,
+        rpName: props.streamersObj[streamer.name].rp_name,
         video_id: findMatchingVOD(streamer.name, state.global_time),
         next_video_id: findNextVOD(streamer.name, state.global_time),
       }
     });
     
     return (
-      <StyledWrapper {...props}>
+      <div className={props.className}>
         <style>{style}</style>
         <div style={{ height: '100vh', width: '100vw'}}>
           {state.thanksShown && (
@@ -293,12 +296,7 @@ class PlayerView extends React.Component {
                         ref={this.multiplayersRef}
                         global_time={state.global_time}
                         streamers={streamers}
-                        onTimeUpdate={time => this.setState(state => {
-                          return ({
-                            ...state,
-                            global_time: time,
-                          });
-                        })}
+                        onTimeUpdate={this.handleTimeUpdate}
                         onRemovePlayer={this.handleRemovePlayer}
                       />
                     )}
@@ -334,7 +332,7 @@ class PlayerView extends React.Component {
             </FlexChild>
           </FlexLayout>
         </div>
-      </StyledWrapper>
+      </div>
     );
   }
   
@@ -367,6 +365,18 @@ class PlayerView extends React.Component {
     });
   }
   
+  handleTimeUpdate(targetTime) {
+    this.setState(state => ({
+      ...state,
+      global_time: targetTime,
+    }), () => {
+      const shareTime = Math.floor(Number(targetTime) / 1000);
+      if (shareTime % 30 === 0) {
+        document.location.hash = this.buildShareHash();
+      }
+    });
+  }
+  
   handleShowEventsPanel() {
     this.setState(state => ({
       ...state,
@@ -376,7 +386,7 @@ class PlayerView extends React.Component {
   
   handleSelectEvent(eventData) {
     const channels = eventData.channels.slice(0, Math.min(eventData.channels.length, 5));
-    console.log(channels);
+    // console.log(channels);
     this.setState(state => ({
       ...state,
       eventsPanelShown: false,
@@ -438,7 +448,7 @@ class PlayerView extends React.Component {
 }
 
 //language=SCSS
-const StyledWrapper = Styled.div`
+const PlayerView = Styled(PlayerViewUnstyled)`
 & {
   iframe {
     height: 100%;

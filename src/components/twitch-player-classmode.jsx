@@ -41,7 +41,7 @@ class TwitchPlayer extends React.Component {
       width: '100%',
       height: '100%',
       video: props.video_id,
-      autoplay: props.shouldPlay,
+      autoplay: false, //props.shouldPlay,
       muted: props.muteOnStart,
       time: tsToVodTime(currentTime),
     };

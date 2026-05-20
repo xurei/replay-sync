@@ -15,32 +15,7 @@ const Twitch = globalThis.Twitch;
 // };
 
 function TwitchPlayer(props/*: TwitchPlayerProps*/) {
-  /*
-  player = null;
-  embedId = null;
-  hasToggledStatus = false;
-
-  prevPlayerState = null;
-
-  state = {
-    ready: false,
-  };
-  */
-
   const embedId = useMemo(() => `twitch-player-${Math.floor(Math.random()*100000)}`, []);
-
-  /*get options() {
-    const props = this.props;
-    const currentTime = props.currentTime < 1000 ? 1000 : props.currentTime;
-    return {
-      width: '100%',
-      height: '100%',
-      video: props.video_id,
-      autoplay: props.shouldPlay,
-      muted: props.muteOnStart,
-      time: tsToVodTime(currentTime),
-    };
-  }*/
   
   const currentTime = props.currentTime < 1000 ? 1000 : props.currentTime;
   const options = {
@@ -53,16 +28,94 @@ function TwitchPlayer(props/*: TwitchPlayerProps*/) {
   };
 
   const [player, setPlayer] = useState(null);
-  const [ready, setReady] = useState(false);
-  const [prevPlayerState, setPrevPlayerState] = useState(null);
-
+  
+  const handleEventEnded = () => {
+    if (props.onEnded) {
+      props.onEnded();
+    }
+  }
+  
   useEffect(() => {
     console.log('DID MOUNT');
+    let vendorReady = false;
+    let prevPlayerState = null;
+    let ready = false;
+    
+    const handleEventUpdateState = (_playerState) => {
+      const playerState = {
+        currentTime: Math.floor(_playerState.currentTime*100)/100.0,
+        ended: _playerState.ended,
+        muted: _playerState.muted,
+        playback: _playerState.playback,
+        qualitiesAvailable: _playerState.qualitiesAvailable,
+      };
+  
+      //console.log(!!player, vendorReady);
+      if (!player || !vendorReady) {
+        return;
+      }
+      
+      if (!deepEqual(prevPlayerState, playerState)) {
+        //console.log(playerState, prevPlayerState);
+        if (!ready) {
+          //console.log('not ready');
+          if (playerState.playback === 'Ready' && playerState.qualitiesAvailable && playerState.qualitiesAvailable.length > 0) {
+            if (props.forceSource) {
+              player.setQuality('chunked');
+            }
+            else {
+              const qualities = player.getQualities();
+              const bestCleanQuality = qualities.filter(q => q.group!=='auto' && q.group!=='chunked')[0];
+              if (bestCleanQuality) {
+                player.setQuality(bestCleanQuality.group);
+              }
+              else {
+                player.setQuality('chunked');
+              }
+            }
+            ready = true;
+          }
+        }
+        else {
+          //console.log(playerState);
+          if (prevPlayerState.playback !== playerState.playback) {
+            props.onPlayerStateChange(playerState.playback);
+          }
+  
+          const time = playerState.currentTime * 1000;
+          if (time !== player.getCurrentTime()*1000) {
+            console.log(`${tsToVodTime(time)} vs ${tsToVodTime(player.getCurrentTime()*1000)}`);
+            console.log(`${(time)} vs ${(player.getCurrentTime()*1000)}`);
+          }
+  
+          if (
+            prevPlayerState.currentTime !== playerState.currentTime
+            && (playerState.playback === 'Playing' || playerState.playback === 'Buffering')
+          ) {
+            props.onPlayerTimeChange(Math.floor(playerState.currentTime*1000), player.getMuted());
+          }
+        }
+        
+        //console.log('-->', playerState);
+        prevPlayerState = playerState;
+      }
+    }
+    
     const player = new Twitch.Embed(embedId, options);
     setPlayer(player);
-    player.addEventListener(Twitch.Player.VIDEO_READY, handleEventReady);
+    player.addEventListener(Twitch.Player.VIDEO_READY, () => {
+      console.log('VIDEO_READY');
+      vendorReady = true;
+      if (props.onReady) {
+        props.onReady();
+      }
+    });
     player.addEventListener(Twitch.Player.ENDED, handleEventEnded);
     player.addEventListener('UPDATE_STATE', handleEventUpdateState);
+    /*player.addEventListener('video.ready', () => {
+      console.log('VIDEO_READY');
+      setVendorReady(true);
+    });*/
 
     return () => {
       player.removeEventListener(Twitch.Player.VIDEO_READY);
@@ -107,72 +160,6 @@ function TwitchPlayer(props/*: TwitchPlayerProps*/) {
       }
     }
   }, [player, props.shouldPlay]);
-
-  const handleEventReady = useMemo(() => () => {
-    if (props.onReady) {
-      props.onReady();
-    }
-  }, []);
-
-  function handleEventEnded() {
-    if (props.onEnded) {
-      props.onEnded();
-    }
-  }
-
-  function handleEventUpdateState(_playerState) {
-    const playerState = {
-      currentTime: Math.floor(_playerState.currentTime*100)/100.0,
-      ended: _playerState.ended,
-      muted: _playerState.muted,
-      playback: _playerState.playback,
-      qualitiesAvailable: _playerState.qualitiesAvailable,
-    };
-
-    if (!deepEqual(prevPlayerState, playerState)) {
-      console.log(playerState, prevPlayerState);
-      if (!ready) {
-        if (playerState.playback === 'Ready' && playerState.qualitiesAvailable && playerState.qualitiesAvailable.length > 0) {
-          if (props.forceSource) {
-            player.setQuality('chunked');
-          }
-          else {
-            const qualities = player.getQualities();
-            const bestCleanQuality = qualities.filter(q => q.group!=='auto' && q.group!=='chunked')[0];
-            if (bestCleanQuality) {
-              player.setQuality(bestCleanQuality.group);
-            }
-            else {
-              player.setQuality('chunked');
-            }
-          }
-          setReady(true);
-        }
-      }
-      else {
-        //console.log(playerState);
-        if (prevPlayerState.playback !== playerState.playback) {
-          props.onPlayerStateChange(playerState.playback);
-        }
-
-        const time = playerState.currentTime * 1000;
-        if (time !== player.getCurrentTime()*1000) {
-          console.log(`${tsToVodTime(time)} vs ${tsToVodTime(player.getCurrentTime()*1000)}`);
-          console.log(`${(time)} vs ${(player.getCurrentTime()*1000)}`);
-        }
-
-        if (
-          prevPlayerState.currentTime !== playerState.currentTime
-          && (playerState.playback === 'Playing' || playerState.playback === 'Buffering')
-        ) {
-          props.onPlayerTimeChange(Math.floor(playerState.currentTime*1000), player.getMuted());
-        }
-      }
-      
-      console.log('-->', playerState);
-      setPrevPlayerState(playerState);
-    }
-  }
 
   return (
     <div id={embedId} style={{height: '100%', visibility: 'visible'}}/>

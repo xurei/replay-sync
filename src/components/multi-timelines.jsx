@@ -85,7 +85,7 @@ class MultiTimelinesUnstyled extends React.Component {
     window.addEventListener('resize', this.resizeListener);
   }
   
-  componentWillUpdate(prevProps, prevState, snapshot) {
+  UNSAFE_componentWillUpdate(prevProps, prevState, snapshot) {
     const props = this.props;
     const streamerNames = props.streamers.map(s => s.name);
     if (!deepEqual(streamerNames, this.streamerNames)) {

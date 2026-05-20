@@ -29,7 +29,7 @@ function DayBlocks(props) {
             }}>
               {props.showLabel && (
                 <div className="text-center" style={{paddingTop: '5px', fontSize:'0.8em'}}>
-                  {divW*props.width > 60 ? `Jour ${dayObj.index}`: `J${dayObj.index}`}
+                  {divW*props.width > 60 ? `Jour ${dayObj.index+1}`: `J${dayObj.index+1}`}
                 </div>
               )}
             </div>

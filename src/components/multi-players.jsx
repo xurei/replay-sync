@@ -7,12 +7,12 @@ import { setSubState } from '../state-util';
 import { tsToTime } from '../time-util';
 import { IconFastForward } from './icon-fast-forward';
 import { IconVolumeOn } from './icon-volume-on';
-import { TwitchPlayer } from './twitch-player-classmode';
+import { TwitchPlayer } from './twitch-player';
 import { YoutubePlayer } from './youtube-player';
 
 let metaByVid = null;
 
-class MultiPlayers extends React.Component {
+class MultiPlayersUnstyled extends React.Component {
   static propTypes = {
     config: PropTypes.object.isRequired,
     metaByVid: PropTypes.object.isRequired,
@@ -121,7 +121,7 @@ class MultiPlayers extends React.Component {
     const nbPlayers = state.players.length;
     
     return (
-      <StyledWrapper {...props}>
+      <div className={props.className}>
         {/*<div className="overlay">*/}
         {/*  <pre>{JSON.stringify(state, null, '  ')}</pre>*/}
         {/*</div>*/}
@@ -147,16 +147,18 @@ class MultiPlayers extends React.Component {
                     <div className="multiplayers__volume-on"><IconVolumeOn size={28} color="#fff"/></div>
                   )}
                   
-                  <Player
-                    key={streamer.video_id}
-                    video_id={this.getVideoId(videoMeta)}
-                    currentTime={expectedTime}
-                    muteOnStart={index !== 0}
-                    forceSource={videoMeta.permanent_id && videoMeta.permanent_id.force_source}
-                    shouldPlay={state.shouldPlay}
-                    onPlayerStateChange={playerState => this.handlePlayerStateChange(index, playerState)}
-                    onPlayerTimeChange={(playerState, isMuted) => this.handlePlayerTimeChange(index, playerState, isMuted)}
-                  />
+                  <div className="multiplayers__player-player">
+                    <Player
+                      key={streamer.video_id}
+                      video_id={this.getVideoId(videoMeta)}
+                      currentTime={expectedTime}
+                      muteOnStart={index !== 0}
+                      forceSource={videoMeta.permanent_id && videoMeta.permanent_id.force_source}
+                      shouldPlay={state.shouldPlay}
+                      onPlayerStateChange={playerState => this.handlePlayerStateChange(index, playerState)}
+                      onPlayerTimeChange={(playerState, isMuted) => this.handlePlayerTimeChange(index, playerState, isMuted)}
+                    />
+                  </div>
                 </div>
               );
             }
@@ -182,7 +184,7 @@ class MultiPlayers extends React.Component {
             }
           })}
         </div>
-      </StyledWrapper>
+      </div>
     );
   }
   
@@ -204,15 +206,26 @@ class MultiPlayers extends React.Component {
         {/*    delay: e.target.value*1000,*/}
         {/*  })));*/}
         {/*}}/>*/}
-        {streamer.video_id && (
-          <span>
-            {streamer.video_id}
-          </span>
-        )}
-        {' '}
-        <button className="multiplayers__close-button" onClick={() => {
-          props.onRemovePlayer(streamer.streamerName);
-        }}>×</button>
+        <div className="multiplayers__stream-info">
+          <div className="multiplayers__streamer-avatar">
+            <img src={`https://protopotes-website.vercel.app/api/pic?u=${streamer.streamerName}`} alt={streamer.streamerName}/>
+          </div>
+          <hgroup>
+            <h3>{streamer.rpName}</h3>
+            <p>{streamer.streamerName}</p>
+          </hgroup>
+        </div>
+        <div className="multiplayers__close-button">
+          {streamer.video_id && (
+            <span>
+              {streamer.video_id}
+            </span>
+          )}
+          {' '}
+          <button onClick={() => {
+            props.onRemovePlayer(streamer.streamerName);
+          }}>×</button>
+        </div>
       </div>
     );
   }
@@ -270,9 +283,8 @@ class MultiPlayers extends React.Component {
 }
 
 //language=SCSS
-const StyledWrapper = Styled.div`
+const MultiPlayers = Styled(MultiPlayersUnstyled)`
 & {
-  display: block;
   height: 100%;
 
   .overlay {
@@ -286,6 +298,8 @@ const StyledWrapper = Styled.div`
   
   .multiplayers__player {
     position: relative;
+    display: flex;
+    flex-direction: column;
     //border: solid 1px #418033;
     &:hover {
       .multiplayers__volume-on {
@@ -310,17 +324,49 @@ const StyledWrapper = Styled.div`
   }
   
   .multiplayers__player-overlay-controls {
-    position: absolute;
     top: 0;
     right: 0;
     z-index: 50;
     padding: 3px 5px;
     //background: #313335;
-    text-align: right;
-    visibility: hidden;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    
+    hgroup > * {
+      margin: 0;
+      line-height: 1.68em;
+      color: #CBCBCB;
+    }
+    hgroup p {
+      line-height: 1.32em;
+      font-size: 0.8em;
+      color: #999;
+    }
+    
+    .multiplayers__stream-info {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+    }
+    
+    .multiplayers__close-button {
+      text-align: right;
+      visibility: hidden;
+    }
   }
-  .multiplayers__player:hover .multiplayers__player-overlay-controls {
+  .multiplayers__player:hover .multiplayers__player-overlay-controls .multiplayers__close-button {
     visibility: visible;
+  }
+  
+  .multiplayers__player-player {
+    height: 100px;
+    width: 100%;
+    align-self: stretch;
+    display: inline-block;
+    flex-grow: 1;
   }
   
   .video-grid {
@@ -360,6 +406,17 @@ const StyledWrapper = Styled.div`
   
   .text-big {
     font-size: 25px;
+  }
+  
+  .multiplayers__streamer-avatar {
+    border-radius: 100px;
+    width: 36px;
+    height: 36px;
+    overflow: hidden;
+    margin-right: 10px;
+    img {
+      width: 100%;
+    }
   }
 }
 `;

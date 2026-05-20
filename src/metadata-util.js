@@ -22,7 +22,16 @@ export function prepareMetadata(allmeta) {
   streamerNames.forEach(streamer => {
     const streamerMeta = allmeta[streamer];
     metaByStreamer[streamer] = {};
+    
+    // Adding potentially missing precomputed data
+    Object.entries(streamerMeta).forEach(entry => {
+      entry[1].created_ts ??= (new Date(entry[1].created_at).getTime());
+    });
+    console.log(streamerMeta);
+    //debugger;
+    
     Object.values(streamerMeta).forEach(vodMeta => {
+      vodMeta = {...vodMeta};
       vodMeta.duration_ms = vodTimeToTs(vodMeta.duration);
       vodMeta.duration_ms_orig = vodMeta.duration_ms;
       totalDuration += vodMeta.duration_ms;
@@ -32,33 +41,39 @@ export function prepareMetadata(allmeta) {
       const permanent_ids = [ ...vodMeta.permanent_ids ];
       delete vodMeta.permanent_ids;
       if (permanent_ids?.length > 0) {
+        //console.log('PAS MEH', streamer, vodMeta.id, JSON.stringify(metaByStreamer[streamer], null, '  '));
+        //debugger;
         persisted++;
         persistedDetailed += permanent_ids?.length;
-        
+
         permanent_ids.forEach((permanentVod, index) => {
+          console.log(streamer, index, permanentVod);
           const persistedVodMeta = { ...vodMeta };
           persistedVodMeta.id = `${persistedVodMeta.id}-${index + 1}`;
           const delayCreated = permanentVod.created_delay || 0;
           persistedVodMeta.createdTs = persistedVodMeta.created_ts + delayCreated;
-          
+
           if (permanentVod.duration) {
             persistedVodMeta.duration_ms = permanentVod.duration;
           }
-          
+
           persistedDuration += persistedVodMeta.duration_ms;
-          
+
           persistedVodMeta.permanent_id = permanentVod;
           metaByVid[`${permanentVod.id}<${persistedVodMeta.id}`] = persistedVodMeta;
           metaByStreamer[streamer][persistedVodMeta.id] = persistedVodMeta;
+          //console.log(streamer, index, permanentVod, 'DONE', metaByStreamer[streamer]);
+          //console.log(`${vodMeta.permanent_id.id}<${vodMeta.id}`)
         });
-        
-        //console.log(`${vodMeta.permanent_id.id}<${vodMeta.id}`)
+
       }
       else {
+        //console.log('MEH', streamer, vodMeta.id);
         metaByVid[vodMeta.id] = vodMeta;
         metaByStreamer[streamer][vodMeta.id] = vodMeta;
         vodMeta.createdTs = vodMeta.created_ts;
         nonPersisted++;
+        //console.log('MEH', streamer, vodMeta.id, JSON.stringify(metaByStreamer[streamer], null, '  '));
       }
     });
   });
@@ -78,6 +93,7 @@ Persisted duration: ${tsToVodTime(persistedDuration)} / ${tsToVodTime(totalDurat
   console.debug('');
   console.debug('');
   console.debug('');
+  //console.debug(metaByVid, metaByStreamer);
 
   return { metaByStreamer, metaByVid };
 }
