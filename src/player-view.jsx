@@ -222,6 +222,8 @@ class PlayerViewUnstyled extends React.Component {
                     streamers: newStreamers,
                     selectStreamerShown: isMultiSelect && newStreamers.length < 9,
                   };
+                }, () => {
+                  document.location.hash = this.buildShareHash();
                 });
               }}
               onClose={state.streamers.length === 0 ? null : () => {
@@ -340,9 +342,7 @@ class PlayerViewUnstyled extends React.Component {
     this.setState(state => ({
       ...state,
       selectStreamerShown: true,
-    }), () => {
-      document.location.hash = this.buildShareHash();
-    });
+    }));
   }
   
   handleRemovePlayer(streamerToRemove) {
